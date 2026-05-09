@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexu</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f2f1ee; --surface:#fff; --surface2:#f0ede8; --border:#e2ddd6;
+    --text:#1a1714; --text-muted:#8a8077;
+    --med-color:#2563a8; --med-bg:#dbeeff; --med-border:#93c5fd;
+    --nut-color:#9b1c3a; --nut-bg:#fde8ee; --nut-border:#f9a8c0;
+    --danger:#c1440e; --danger-light:#fce8e0;
+    --warning:#b5651d; --warning-light:#fef3e2;
+    --success:#2d6a4f; --success-light:#d8f3dc;
+    --promo:#1d6fa4; --promo-light:#dbeeff;
+    --track:#e2ddd6;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  /* HEADER */
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.75rem; height:54px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+  .logo { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; }
+  .logo span { color:var(--med-color); }
+  nav { display:flex; gap:0.2rem; }
+  nav a { text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:500; padding:0.38rem 0.75rem; border-radius:7px; transition:all 0.15s; }
+  nav a:hover, nav a.active { background:var(--surface2); color:var(--text); }
+  .date-chip { font-size:0.72rem; color:var(--text-muted); background:var(--surface2); padding:0.28rem 0.7rem; border-radius:20px; border:1px solid var(--border); }
+
+  /* MAIN */
+  main { max-width:1280px; margin:0 auto; padding:1.5rem; }
+  .page-header { display:flex; align-items:baseline; gap:0.7rem; margin-bottom:1.25rem; }
+  .page-title { font-family:'Montserrat',sans-serif; font-size:1.35rem; font-weight:800; letter-spacing:-0.03em; }
+  .page-subtitle { color:var(--text-muted); font-size:0.82rem; }
+
+  /* GRID */
+  .materias-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.85rem; margin-bottom:1.25rem; }
+
+  /* CARD */
+  .materia-card { background:var(--surface); border-radius:12px; border:1.5px solid var(--border); overflow:visible; transition:box-shadow 0.18s,transform 0.18s; position:relative; }
+  .materia-card:hover { box-shadow:0 4px 18px rgba(0,0,0,0.08); transform:translateY(-1px); }
+  .materia-card.medicina { border-color:var(--med-border); }
+  .materia-card.nutricion { border-color:var(--nut-border); }
+
+  .card-top { padding:0.85rem 1rem 0.75rem; overflow:visible; }
+  .card-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:0.4rem; margin-bottom:0.5rem; }
+  .materia-nombre { font-family:'Montserrat',sans-serif; font-size:0.92rem; font-weight:700; line-height:1.2; flex:1; }
+
+  .carrera-chip { font-size:0.62rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:6px; flex-shrink:0; text-transform:uppercase; letter-spacing:0.04em; }
+  .chip-medicina { background:var(--med-bg); color:var(--med-color); }
+  .chip-nutricion { background:var(--nut-bg); color:var(--nut-color); }
+
+  /* META ROW */
+  .meta-row { display:flex; align-items:center; gap:0.35rem; margin-bottom:0.6rem; flex-wrap:wrap; position:relative; }
+
+  .tipo-chip { font-size:0.62rem; font-weight:600; padding:0.15rem 0.42rem; border-radius:6px; cursor:pointer; }
+  .tipo-regular { background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); }
+  .tipo-promocional { background:var(--promo-light); color:var(--promo); }
+
+  .cuatri-chip { font-size:0.62rem; color:var(--text-muted); background:var(--surface2); padding:0.15rem 0.42rem; border-radius:6px; border:1px solid var(--border); cursor:pointer; white-space:nowrap; }
+  .cuatri-chip:hover { background:var(--border); }
+
+  /* FALTAS */
+  .faltas-chip { font-weight:700 !important; cursor:pointer; }
+  .faltas-ok { background:var(--success-light) !important; color:var(--success) !important; border-color:#6ee7b7 !important; }
+  .faltas-riesgo { background:var(--warning-light) !important; color:var(--warning) !important; border-color:#fbbf24 !important; }
+  .faltas-llena { background:var(--danger-light) !important; color:var(--danger) !important; border-color:#fca5a5 !important; }
+
+  /* DROPDOWN GENÉRICO */
+  .dd-wrap { position:relative; display:inline-block; }
+  .dd-menu { display:none; position:absolute; top:calc(100% + 4px); left:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.12); z-index:500; min-width:140px; padding:0.3rem; white-space:nowrap; }
+  .dd-menu.open { display:block; }
+  .dd-opt { font-size:0.73rem; padding:0.3rem 0.55rem; border-radius:5px; cursor:pointer; color:var(--text); }
+  .dd-opt:hover { background:var(--surface2); }
+  .dd-opt.sel { background:var(--text); color:white; }
+
+  /* FALTAS PANEL */
+  .faltas-panel { display:none; position:absolute; top:calc(100% + 4px); right:0; background:var(--surface); border:1px solid var(--border); border-radius:9px; box-shadow:0 4px 16px rgba(0,0,0,0.12); z-index:500; padding:0.7rem 0.85rem; min-width:170px; }
+  .faltas-panel.open { display:block; }
+  .faltas-panel-title { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.45rem; }
+  .faltas-row { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.35rem; font-size:0.73rem; color:var(--text-muted); }
+  .faltas-num { width:42px; border:1px solid var(--border); border-radius:5px; padding:0.2rem 0.3rem; font-size:0.78rem; text-align:center; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; -moz-appearance:textfield; }
+  .faltas-num::-webkit-outer-spin-button,.faltas-num::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .btn-faltas-ok { width:100%; margin-top:0.3rem; padding:0.32rem; border-radius:6px; border:none; background:var(--text); color:white; font-size:0.72rem; font-family:'DM Sans',sans-serif; cursor:pointer; }
+
+  /* CONDICIONES */
+  .cond-panel { display:none; background:var(--surface2); border-radius:8px; padding:0.6rem 0.75rem; margin:0.3rem 0 0.4rem; border:1px solid var(--border); }
+  .cond-panel.open { display:block; }
+  .cond-title { font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.35rem; }
+  .cond-lista { list-style:none; }
+  .cond-item { display:flex; align-items:flex-start; gap:0.35rem; font-size:0.74rem; padding:0.18rem 0; border-bottom:1px solid var(--border); }
+  .cond-item:last-child { border-bottom:none; }
+  .cond-item .ci-check { color:var(--success); font-size:0.68rem; flex-shrink:0; margin-top:2px; }
+  .cond-item .ci-txt { flex:1; line-height:1.4; }
+  .btn-del-cond { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.7rem; }
+  .btn-del-cond:hover { color:var(--danger); }
+  .add-cond-row { display:flex; gap:0.28rem; margin-top:0.38rem; }
+  .add-cond-inp { flex:1; border:1px solid var(--border); border-radius:5px; padding:0.26rem 0.45rem; font-size:0.71rem; font-family:'DM Sans',sans-serif; background:white; outline:none; color:var(--text); }
+  .add-cond-inp:focus { border-color:var(--med-border); }
+  .btn-add-cond { background:white; border:1px solid var(--border); border-radius:5px; padding:0.26rem 0.5rem; font-size:0.72rem; cursor:pointer; color:var(--text-muted); }
+
+  /* TIMELINE */
+  .timeline-wrap { margin-bottom:0.65rem; }
+  .timeline-dates { display:flex; justify-content:space-between; font-size:0.59rem; color:var(--text-muted); margin-bottom:0.28rem; }
+  .timeline-track { position:relative; height:5px; background:var(--track); border-radius:10px; overflow:visible; }
+  .timeline-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#94a3b8,#64748b); }
+  .timeline-dot { position:absolute; top:50%; transform:translateY(-50%); width:8px; height:8px; border-radius:50%; border:1.5px solid white; }
+  .dot-today { background:#3b82f6; z-index:2; }
+  .dot-parcial { background:#ef4444; z-index:3; }
+  .timeline-labels { position:relative; height:14px; margin-top:2px; }
+  .parcial-label { position:absolute; top:0; font-size:0.54rem; color:#ef4444; font-weight:600; transform:translateX(-50%); white-space:nowrap; }
+
+  /* EXAMEN */
+  .examen-row { display:flex; align-items:center; justify-content:space-between; }
+  .examen-info { font-size:0.72rem; color:var(--text-muted); }
+  .examen-info strong { color:var(--text); }
+  .dias-chip { font-size:0.68rem; font-weight:700; padding:0.2rem 0.55rem; border-radius:7px; }
+  .dias-urgente { background:var(--danger-light); color:var(--danger); }
+  .dias-pronto { background:var(--warning-light); color:var(--warning); }
+  .dias-ok { background:var(--success-light); color:var(--success); }
+  .dias-sin-fecha { background:var(--surface2); color:var(--text-muted); }
+
+  /* BOTONES CARD */
+  .card-btns { display:flex; gap:0.35rem; padding:0.55rem 1rem; border-top:1px solid var(--surface2); flex-wrap:wrap; }
+  .btn-card { font-family:'DM Sans',sans-serif; font-size:0.68rem; font-weight:500; padding:0.28rem 0.65rem; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; text-decoration:none; transition:all 0.13s; display:inline-flex; align-items:center; gap:0.25rem; }
+  .btn-card:hover { background:var(--surface2); color:var(--text); }
+
+  /* PENDIENTES */
+  .pendientes-panel { display:none; border-top:1px solid var(--surface2); padding:0.65rem 1rem; }
+  .pendientes-panel.open { display:block; }
+  .section-label { font-size:0.67rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.4rem; display:flex; align-items:center; justify-content:space-between; }
+  .pendientes-lista { list-style:none; }
+  .pendiente-item { display:flex; align-items:center; gap:0.5rem; padding:0.3rem 0; border-bottom:1px solid var(--surface2); font-size:0.78rem; }
+  .pendiente-item:last-child { border-bottom:none; }
+  .pendiente-item input[type="checkbox"] { width:13px; height:13px; accent-color:var(--med-color); cursor:pointer; flex-shrink:0; }
+  .pendiente-item label { cursor:pointer; flex:1; line-height:1.3; }
+  .pendiente-item.done label { text-decoration:line-through; color:var(--text-muted); }
+  .btn-del { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.75rem; }
+  .add-pendiente { display:flex; gap:0.35rem; margin-top:0.4rem; }
+  .add-pendiente input { flex:1; border:1px solid var(--border); border-radius:6px; padding:0.28rem 0.5rem; font-size:0.74rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; color:var(--text); }
+  .add-pendiente input:focus { border-color:var(--med-border); }
+  .btn-add { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:0.28rem 0.55rem; font-size:0.75rem; cursor:pointer; color:var(--text-muted); }
+
+  /* BOTÓN AGREGAR MATERIA */
+  .btn-add-materia-card { background:var(--surface); border:2px dashed var(--border); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.45rem; cursor:pointer; color:var(--text-muted); font-family:'DM Sans',sans-serif; transition:all 0.15s; min-height:180px; width:100%; }
+  .btn-add-materia-card:hover { border-color:var(--text-muted); color:var(--text); background:var(--surface2); }
+  .btn-add-materia-card .ic { font-size:1.6rem; }
+  .btn-add-materia-card .lbl { font-size:0.75rem; font-weight:600; }
+
+  /* FINALES */
+  .finales-section { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .finales-header { padding:0.8rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .finales-title { font-family:'Montserrat',sans-serif; font-size:0.92rem; font-weight:700; }
+  .finales-subtitle { font-size:0.72rem; color:var(--text-muted); }
+  .btn-agregar-final { font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500; padding:0.32rem 0.8rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+  .btn-agregar-final:hover { background:var(--surface2); color:var(--text); }
+  .finales-empty { padding:1.5rem; text-align:center; color:var(--text-muted); font-size:0.8rem; }
+  .final-row { display:grid; grid-template-columns:2fr 0.7fr 1fr 0.5fr 0.7fr auto; align-items:center; gap:0.75rem; padding:0.65rem 1.25rem; border-bottom:1px solid var(--surface2); font-size:0.78rem; transition:background 0.13s; }
+  .final-row:last-child { border-bottom:none; }
+  .final-row:hover { background:var(--surface2); }
+  .final-nombre { font-weight:600; font-size:0.8rem; }
+  .final-carrera { font-size:0.68rem; color:var(--text-muted); }
+  .modalidad-chip { font-size:0.64rem; font-weight:600; padding:0.16rem 0.48rem; border-radius:7px; display:inline-block; }
+  .libre { background:#fff3cd; color:#856404; }
+  .regular-m { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
+  .regular { background:var(--success-light); color:var(--success); }
+  .revalida { background:var(--promo-light); color:var(--promo); }
+  .btn-final-detail { background:none; border:1px solid var(--border); border-radius:6px; padding:0.22rem 0.55rem; font-size:0.7rem; cursor:pointer; color:var(--text-muted); font-family:'DM Sans',sans-serif; }
+  .btn-final-detail:hover { background:var(--surface2); }
+  /* MESAS */
+  .mesa-chip { font-size:0.68rem; font-weight:600; padding:0.28rem 0.65rem; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; display:flex; flex-direction:column; align-items:center; gap:0.05rem; }
+  .mesa-chip:hover { border-color:var(--med-color); color:var(--med-color); background:var(--med-bg); }
+  .mesa-chip.proxima { border-color:var(--med-color); color:var(--med-color); background:var(--med-bg); }
+  .mesa-chip.pasada { opacity:0.45; }
+  .mesa-dias { font-size:0.58rem; font-weight:400; color:inherit; }
+
+  /* MODALES */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.32); z-index:1000; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--surface); border-radius:14px; padding:1.4rem; width:460px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.15); }
+  .modal h3 { font-family:'Montserrat',sans-serif; font-size:1rem; font-weight:700; margin-bottom:1rem; }
+  .form-group { margin-bottom:0.8rem; }
+  .form-group label { display:block; font-size:0.7rem; font-weight:600; color:var(--text-muted); margin-bottom:0.28rem; text-transform:uppercase; letter-spacing:0.05em; }
+  .form-group input,.form-group select,.form-group textarea { width:100%; border:1px solid var(--border); border-radius:7px; padding:0.52rem 0.75rem; font-size:0.82rem; font-family:'DM Sans',sans-serif; background:var(--surface2); color:var(--text); outline:none; }
+  .form-group input:focus,.form-group select:focus { border-color:var(--med-border); background:var(--surface); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+  .modal-actions { display:flex; gap:0.45rem; justify-content:flex-end; margin-top:1rem; flex-wrap:wrap; }
+  .btn-cancel { padding:0.45rem 1rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.8rem; cursor:pointer; color:var(--text-muted); }
+  .btn-save { padding:0.45rem 1rem; border-radius:7px; border:none; background:var(--text); color:white; font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:500; cursor:pointer; }
+  .btn-save:hover { opacity:0.85; }
+  .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.9rem; }
+  .detail-item label { font-size:0.66rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); display:block; margin-bottom:0.12rem; }
+  .detail-item span { font-size:0.83rem; font-weight:500; }
+  .unidades-lista { list-style:none; }
+  .unidad-item { padding:0.45rem 0.6rem; background:var(--surface2); border-radius:7px; margin-bottom:0.3rem; font-size:0.78rem; display:flex; align-items:center; gap:0.4rem; }
+  .unidad-num { font-size:0.62rem; font-weight:700; background:var(--border); color:var(--text-muted); width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+  /* NOTAS */
+  .notas-panel { display:none; border-top:1px solid var(--surface2); padding:0.65rem 1rem; }
+  .notas-panel.open { display:block; }
+  .nota-item { display:flex; align-items:center; gap:0.5rem; padding:0.32rem 0; border-bottom:1px solid var(--surface2); font-size:0.77rem; }
+  .nota-item:last-child { border-bottom:none; }
+  .nota-parcial { flex:1; font-weight:500; }
+  .nota-num { font-family:'Montserrat',sans-serif; font-weight:700; font-size:0.9rem; min-width:28px; text-align:center; }
+  .nota-aprobada { color:var(--success); }
+  .nota-desaprobada { color:var(--danger); }
+  .nota-estado { font-size:0.65rem; font-weight:600; padding:0.15rem 0.42rem; border-radius:5px; }
+  .nota-estado.ok { background:var(--success-light); color:var(--success); }
+  .nota-estado.fail { background:var(--danger-light); color:var(--danger); }
+  .nota-fecha { font-size:0.68rem; color:var(--text-muted); }
+  .btn-del-nota { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.72rem; }
+  .add-nota-row { display:flex; gap:0.28rem; margin-top:0.45rem; flex-wrap:wrap; align-items:center; }
+  .nota-inp { border:1px solid var(--border); border-radius:5px; padding:0.26rem 0.45rem; font-size:0.72rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; color:var(--text); }
+  .nota-inp:focus { border-color:var(--med-border); }
+  .nota-inp.w-name { flex:1; min-width:80px; }
+  .nota-inp.w-num { width:46px; text-align:center; }
+  .nota-inp.w-date { width:100px; }
+  .btn-add-nota { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:0.26rem 0.55rem; font-size:0.72rem; cursor:pointer; color:var(--text-muted); white-space:nowrap; }
+  .btn-add-nota:hover { background:var(--surface2); }
+
+  @media(max-width:1024px) { .materias-grid { grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:600px) { .materias-grid { grid-template-columns:1fr; } nav { display:none; } main { padding:1rem 0.85rem; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Ne<span>xu</span></div>
+  <nav>
+    <a href="portada.html" class="active">Inicio</a>
+    <a href="plan.html">Plan</a>
+  </nav>
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <button onclick="exportarDatos()" style="font-size:0.7rem;font-weight:500;padding:0.28rem 0.7rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif" title="Exportar todos tus datos">⬇ Exportar</button>
+    <button onclick="document.getElementById('import-input').click()" style="font-size:0.7rem;font-weight:500;padding:0.28rem 0.7rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif" title="Importar datos desde backup">⬆ Importar</button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDatos(this)">
+    <div class="date-chip" id="fecha-hoy"></div>
+  </div>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1 class="page-title">Hola, Maira 👋</h1>
+    <span class="page-subtitle">1er cuatrimestre 2026 · 1 abr → 17 jul</span>
+  </div>
+
+  <div class="materias-grid" id="materias-grid"></div>
+
+  <div class="finales-section" style="margin-top:0">
+    <div class="finales-header">
+      <div>
+        <div class="finales-title">Finales en preparación</div>
+        <div class="finales-subtitle">Materias que estás rindiendo en paralelo</div>
+      </div>
+      <div style="display:flex;gap:0.4rem">
+        <button class="btn-agregar-final" onclick="abrirHistorial()">📋 Ver historial de aprobados</button>
+        <button class="btn-agregar-final" onclick="abrirModalFinal()" style="background:var(--text);color:white;border-color:var(--text)">+ Agregar final</button>
+      </div>
+    </div>
+
+    <!-- MESAS DEL AÑO -->
+    <div style="padding:0.75rem 1.25rem;border-bottom:1px solid var(--border);background:var(--surface2)">
+      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.5rem">Calendario de mesas 2026</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem" id="mesas-chips"></div>
+    </div>
+
+    <div id="finales-container"></div>
+  </div>
+</main>
+
+<!-- MODAL AGREGAR MATERIA -->
+<div class="modal-overlay" id="modal-materia">
+  <div class="modal">
+    <h3 id="mm-titulo">Agregar materia</h3>
+    <input type="hidden" id="mm-id">
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" id="mm-nombre" placeholder="Ej: Consumos Problemáticos">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Carrera</label>
+        <select id="mm-carrera">
+          <option value="Medicina">Medicina</option>
+          <option value="Nutrición">Nutrición</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Año</label>
+        <select id="mm-año">
+          <option>1° año</option><option>2° año</option><option>3° año</option><option>4° año</option><option>5° año</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="mm-tipo">
+          <option value="regular">Regular</option>
+          <option value="promocional">Promocional</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cuatrimestre</label>
+        <select id="mm-cuatri">
+          <option>1° cuatrimestre</option><option>2° cuatrimestre</option><option>Anual</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Faltas actuales</label>
+        <input type="number" id="mm-fact" value="0" min="0" max="20">
+      </div>
+      <div class="form-group">
+        <label>Máximo faltas</label>
+        <input type="number" id="mm-fmax" value="3" min="1" max="20">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Fecha del examen (opcional)</label>
+      <input type="date" id="mm-examen">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal('modal-materia')">Cancelar</button>
+      <button class="btn-save" id="mm-btn-del" style="background:var(--danger);display:none" onclick="eliminarMateriaCustom()">Eliminar</button>
+      <button class="btn-save" onclick="guardarMateria()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR FINAL -->
+<div class="modal-overlay" id="modal-final">
+  <div class="modal">
+    <h3>Agregar final</h3>
+    <div class="form-group">
+      <label>Materia</label>
+      <select id="f-materia-id" onchange="onSelectMateria(this)">
+        <option value="">— Elegí una materia —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Carrera</label><input type="text" id="f-carrera-display" readonly style="background:var(--surface2);color:var(--text-muted)"></div>
+      <div class="form-group"><label>Modalidad</label>
+        <select id="f-modalidad">
+          <option value="regular-m">Regular</option>
+          <option value="libre">Libre</option>
+          <option value="revalida">Reválida</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha del examen</label><input type="date" id="f-fecha"></div>
+      <div class="form-group"><label>Nota (si ya rendiste)</label><input type="number" id="f-nota" min="1" max="10" step="0.5" placeholder="—"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal('modal-final')">Cancelar</button>
+      <button class="btn-save" onclick="guardarFinal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL FINALES -->
+<div class="modal-overlay" id="modal-historial">
+  <div class="modal" style="width:520px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3>📋 Historial de finales aprobados</h3>
+      <button class="btn-cancel" onclick="cerrarModal('modal-historial')">Cerrar</button>
+    </div>
+    <div id="historial-container"></div>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR PARCIAL -->
+<div class="modal-overlay" id="modal-parcial">
+  <div class="modal">
+    <h3 id="mp-titulo">Parciales de <span id="mp-materia-nombre"></span></h3>
+    <input type="hidden" id="mp-materia-id">
+    <div id="mp-lista-parciales" style="margin-bottom:1rem"></div>
+    <div style="border-top:1px solid var(--border);padding-top:0.85rem">
+      <div style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem">Agregar parcial</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="mp-nombre" placeholder="Ej: Parcial 1">
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="mp-fecha">
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:0.5rem">
+        <button class="btn-cancel" onclick="cerrarModal('modal-parcial')">Cerrar</button>
+        <button class="btn-save" onclick="guardarParcialPortada()">+ Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRAMA FILE INPUT -->
+<input type="file" id="prog-file-input" accept=".pdf" style="display:none">
+
+<script src="data.js"></script>
+<script>
+// ── CONSTANTES ──
+const INICIO_CUATRI = new Date(2026,3,1);
+const FIN_CUATRI    = new Date(2026,6,17);
+const hoy = new Date();
+document.getElementById('fecha-hoy').textContent = hoy.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+
+// ── UTILS ──
+function diasRestantes(s) {
+  if (!s) return null;
+  const [d,m,y]=s.split('/');
+  return Math.ceil((new Date(y,m-1,d)-hoy)/86400000);
+}
+function chipDias(d) {
+  if (d===null) return `<span class="dias-chip dias-sin-fecha">Sin fecha</span>`;
+  if (d<0)  return `<span class="dias-chip dias-urgente">Venció</span>`;
+  if (d===0)return `<span class="dias-chip dias-urgente">¡Hoy!</span>`;
+  if (d<=7) return `<span class="dias-chip dias-urgente">${d}d</span>`;
+  if (d<=21)return `<span class="dias-chip dias-pronto">${d}d</span>`;
+  return `<span class="dias-chip dias-ok">${d}d</span>`;
+}
+function pct(f) {
+  const total=FIN_CUATRI-INICIO_CUATRI;
+  return ((Math.min(Math.max(f-INICIO_CUATRI,0),total)/total)*100).toFixed(2);
+}
+function slugify(s) { return s.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''); }
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── STORAGE HELPERS ──
+function ls(k) { try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;} }
+function lsSet(k,v) { localStorage.setItem(k,JSON.stringify(v)); }
+
+// ── OVERRIDES POR MATERIA (año, cuatri, faltas editados desde app) ──
+function getOv(id) { return ls('ov_'+id)||{}; }
+function setOv(id,data) { lsSet('ov_'+id,data); }
+
+// ── MATERIAS CUSTOM ──
+function getCustom() { return ls('materias_custom')||[]; }
+function setCustom(l) { lsSet('materias_custom',l); }
+
+// ── CONDICIONES EXTRA ──
+function getCondExtra(id) { return ls('cond_extra_'+id)||[]; }
+function setCondExtra(id,l) { lsSet('cond_extra_'+id,l); }
+
+// ── PROGRAMA ──
+function getProgUrl(id) { return localStorage.getItem('prog_url_'+id)||''; }
+function setProgUrl(id,url) { localStorage.setItem('prog_url_'+id,url); }
+
+// ── PENDIENTES ──
+function getPend(id) { return ls('pend_'+id)||[]; }
+function setPend(id,l) { lsSet('pend_'+id,l); }
+
+// ── MERGE: base + overrides ──
+function getMateriaOcultas(){ return ls('materias_ocultas')||[]; }
+
+function eliminarMateriaCursada(id){
+  if(!confirm('¿Quitar esta materia del inicio? Sus datos quedan guardados pero la tarjeta desaparece.')) return;
+  const custom = getCustom();
+  if(custom.some(x=>x.id===id)){
+    setCustom(custom.filter(x=>x.id!==id));
+  } else {
+    const ocultas = getMateriaOcultas();
+    if(!ocultas.includes(id)){ ocultas.push(id); lsSet('materias_ocultas',ocultas); }
+  }
+  renderMaterias();
+}
+
+function getAllMaterias() {
+  const ocultas = getMateriaOcultas();
+  const base = MATERIAS.filter(m=>!ocultas.includes(m.id)).map(m => {
+    const ov = getOv(m.id);
+    return {
+      ...m,
+      año:        ov.año        || m.año,
+      cuatrimestre: ov.cuatrimestre || m.cuatrimestre,
+      tipo:       ov.tipo       || m.tipo,
+      faltas:     ov.faltas     || m.faltas || {actuales:0,maximo:3},
+    };
+  });
+  return [...base, ...getCustom()];
+}
+
+// ── TIMELINE ──
+function buildTimeline(parciales) {
+  const prog=pct(hoy);
+  const dots=(parciales||[]).map(p=>{
+    if(!p.fecha) return '';
+    const [d,m,y]=p.fecha.split('/'); const f=new Date(y,m-1,d); const pos=pct(f);
+    if(pos<0||pos>100) return '';
+    return `<div class="timeline-dot dot-parcial" style="left:${pos}%" title="${p.nombre}: ${p.fecha}"></div>`;
+  }).join('');
+  const labs=(parciales||[]).map(p=>{
+    if(!p.fecha) return '';
+    const [d,m,y]=p.fecha.split('/'); const f=new Date(y,m-1,d); const pos=pct(f);
+    if(pos<0||pos>100) return '';
+    return `<span class="parcial-label" style="left:${pos}%">${p.nombre}</span>`;
+  }).join('');
+  return `<div class="timeline-wrap">
+    <div class="timeline-dates"><span>1 abr</span><span>17 jul</span></div>
+    <div class="timeline-track">
+      <div class="timeline-fill" style="width:${prog}%"></div>
+      <div class="timeline-dot dot-today" style="left:${prog}%" title="Hoy"></div>
+      ${dots}
+    </div>
+    <div class="timeline-labels">${labs}</div>
+  </div>`;
+}
+
+// ── BUILD CARD ──
+function buildCard(m) {
+  const dias = diasRestantes(m.examen);
+  const tipoCls = m.tipo==='promocional'?'tipo-promocional':'tipo-regular';
+  const tipoLabel = m.tipo==='promocional'?'⭐ Promo':'Regular';
+  const carreraCls = m.carrera==='Medicina'?'medicina':'nutricion';
+  const chipCls = m.carrera==='Medicina'?'chip-medicina':'chip-nutricion';
+  const pendCount = getPend(m.id).filter(p=>!p.done).length;
+  const f = m.faltas||{actuales:0,maximo:3};
+  const fCls = f.actuales>=f.maximo?'faltas-llena':f.actuales>=f.maximo-1?'faltas-riesgo':'faltas-ok';
+  const progUrl = getProgUrl(m.id)||m.programa||'';
+  const isCustom = getCustom().some(x=>x.id===m.id);
+  const condBase = m.condiciones||[];
+  const condExtra = getCondExtra(m.id);
+  const todasCond = [...condBase,...condExtra];
+
+  return `
+  <div class="materia-card ${carreraCls}" id="card-${m.id}">
+    <div class="card-top">
+      <div class="card-title-row">
+        <div class="materia-nombre">${m.nombre}</div>
+        <div style="display:flex;align-items:center;gap:0.3rem">
+          <span class="carrera-chip ${chipCls}">${m.carrera}</span>
+          ${isCustom?`<button style="background:none;border:none;cursor:pointer;font-size:0.72rem;color:var(--text-muted);padding:0" onclick="abrirEditarMateria('${m.id}')" title="Editar">✎</button>`:''}
+          <button onclick="eliminarMateriaCursada('${m.id}')" title="Quitar materia" style="background:none;border:none;cursor:pointer;font-size:0.72rem;color:var(--text-muted);padding:0;line-height:1;opacity:0.5" onmouseover="this.style.opacity='1';this.style.color='var(--danger)'" onmouseout="this.style.opacity='0.5';this.style.color='var(--text-muted)'">×</button>
+        </div>
+      </div>
+
+      <div class="meta-row">
+        <!-- TIPO → condiciones -->
+        <span class="tipo-chip ${tipoCls}" onclick="toggleCond('${m.id}')" title="Ver condiciones">${tipoLabel} ▾</span>
+
+        <!-- CUATRIMESTRE dropdown -->
+        <div class="dd-wrap">
+          <span class="cuatri-chip" onclick="toggleDD('dd-cuatri-${m.id}')">${m.cuatrimestre.replace('° cuatrimestre','° cuatri')} ▾</span>
+          <div class="dd-menu" id="dd-cuatri-${m.id}">
+            ${['1° cuatri','2° cuatri','Anual'].map(v=>`
+              <div class="dd-opt ${m.cuatrimestre===v||m.cuatrimestre===v.replace('cuatri','cuatrimestre')?'sel':''}" onclick="setOvField('${m.id}','cuatrimestre','${v}','dd-cuatri-${m.id}')">${v}</div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- AÑO dropdown -->
+        <div class="dd-wrap">
+          <span class="cuatri-chip" onclick="toggleDD('dd-año-${m.id}')">${m.año} ▾</span>
+          <div class="dd-menu" id="dd-año-${m.id}">
+            ${['1° año','2° año','3° año','4° año','5° año'].map(v=>`
+              <div class="dd-opt ${m.año===v?'sel':''}" onclick="setOvField('${m.id}','año','${v}','dd-año-${m.id}')">${v}</div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- FALTAS -->
+        <div class="dd-wrap" style="margin-left:auto">
+          <span class="cuatri-chip faltas-chip ${fCls}" onclick="toggleDD('dd-faltas-${m.id}')">F ${f.actuales}/${f.maximo} ▾</span>
+          <div class="dd-menu faltas-panel" id="dd-faltas-${m.id}" style="right:0;left:auto;min-width:170px">
+            <div class="faltas-panel-title">Editar faltas</div>
+            <div class="faltas-row"><span>Actuales:</span><input type="number" class="faltas-num" id="fi-act-${m.id}" value="${f.actuales}" min="0" max="20" onclick="event.stopPropagation()"></div>
+            <div class="faltas-row"><span>Máximo:</span><input type="number" class="faltas-num" id="fi-max-${m.id}" value="${f.maximo}" min="1" max="20" onclick="event.stopPropagation()"></div>
+            <button class="btn-faltas-ok" onclick="event.stopPropagation();guardarFaltas('${m.id}')">Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONDICIONES -->
+      <div class="cond-panel" id="cond-${m.id}">
+        <div class="cond-title">Condiciones de ${m.tipo==='promocional'?'promoción':'regularidad'}</div>
+        <ul class="cond-lista">
+          ${condExtra.map((c,i)=>`
+            <li class="cond-item">
+              <span class="ci-check">✓</span>
+              <span class="ci-txt">${c}</span>
+              <button class="btn-del-cond" onclick="borrarCond('${m.id}',${i})">×</button>
+            </li>`).join('')||'<li style="font-size:0.74rem;color:var(--text-muted);padding:0.2rem 0">Sin condiciones. Agregá las tuyas abajo.</li>'}
+        </ul>
+        <div class="add-cond-row">
+          <input class="add-cond-inp" id="cond-inp-${m.id}" placeholder="Agregar condición..." onkeydown="if(event.key==='Enter')agregarCond('${m.id}')">
+          <button class="btn-add-cond" onclick="agregarCond('${m.id}')">+</button>
+        </div>
+      </div>
+
+      ${buildTimeline(getTodasParciales(m))}
+
+      <div class="examen-row">
+        ${(()=>{
+          const prox = getProximoParcial(m);
+          const fecha = prox?.fecha || m.examen || '';
+          const dias = diasRestantes(fecha);
+          const label = prox ? prox.nombre : 'Examen';
+          return `<span class="examen-info">${label}: <strong>${fecha||'Sin fecha'}</strong></span>${chipDias(dias)}`;
+        })()}
+      </div>
+    </div>
+
+    <div class="card-btns">
+      ${progUrl
+        ?`<button class="btn-card" onclick="abrirPrograma('${m.id}')">📋 Programa</button>`
+        :`<span class="btn-card" style="opacity:0.4;cursor:default">📋 Sin programa</span>`}
+      <a href="temario.html?materia=${m.id}" class="btn-card">📝 Temario</a>
+      <button class="btn-card" onclick="abrirModalParciales('${m.id}')">📅 Parciales</button>
+      <button class="btn-card" onclick="togglePendPanel('${m.id}')">
+        ✅ Pendientes${pendCount>0?` <span style="background:#ef4444;color:white;border-radius:10px;padding:0 5px;font-size:0.6rem">${pendCount}</span>`:''}
+      </button>
+      <button class="btn-card" onclick="toggleNotasPanel('${m.id}')">📊 Notas</button>
+    </div>
+
+    <div class="pendientes-panel" id="pend-${m.id}">
+      ${buildPendPanel(m.id)}
+    </div>
+
+    <div class="notas-panel" id="notas-${m.id}">
+      ${buildNotasPanel(m.id)}
+    </div>
+  </div>`;
+}
+
+// ── ADD MATERIA BUTTON CARD ──
+function buildAddCard() {
+  return `<button class="btn-add-materia-card" onclick="abrirModalMateria()">
+    <span class="ic">＋</span>
+    <span class="lbl">Agregar materia</span>
+  </button>`;
+}
+
+// ── RENDER GRID ──
+function renderMaterias() {
+  const grid = document.getElementById('materias-grid');
+  grid.innerHTML = '';
+  const todas = getAllMaterias().sort((a,b)=>{
+    if(a.carrera===b.carrera) return 0;
+    return a.carrera==='Medicina' ? -1 : 1;
+  });
+  todas.forEach(m => grid.insertAdjacentHTML('beforeend', `<div>${buildCard(m)}</div>`));
+  grid.insertAdjacentHTML('beforeend', `<div>${buildAddCard()}</div>`);
+}
+
+function refreshCard(id) {
+  const m = getAllMaterias().find(x=>x.id===id);
+  if (!m) return;
+  const card = document.getElementById('card-'+id);
+  if (!card) return;
+  const condOpen = card.querySelector('.cond-panel.open')!==null;
+  const pendOpen = card.querySelector('.pendientes-panel.open')!==null;
+  card.outerHTML = buildCard(m);
+  if (condOpen) document.getElementById('cond-'+id)?.classList.add('open');
+  if (pendOpen) document.getElementById('pend-'+id)?.classList.add('open');
+}
+
+// ── DROPDOWNS ──
+function toggleDD(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  closeAllDD();
+  if (!wasOpen) el.classList.add('open');
+}
+function closeAllDD() {
+  document.querySelectorAll('.dd-menu.open').forEach(d=>d.classList.remove('open'));
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dd-wrap')) closeAllDD();
+});
+
+// ── SETFIELD ──
+function setOvField(id, campo, valor, ddId) {
+  const ov = getOv(id);
+  ov[campo] = valor;
+  setOv(id, ov);
+  closeAllDD();
+  refreshCard(id);
+}
+
+// ── FALTAS ──
+function guardarFaltas(id) {
+  const act = parseInt(document.getElementById('fi-act-'+id)?.value)||0;
+  const max = parseInt(document.getElementById('fi-max-'+id)?.value)||3;
+  const ov = getOv(id);
+  ov.faltas = {actuales:act, maximo:max};
+  setOv(id, ov);
+  // también en custom si aplica
+  const custom = getCustom();
+  const ci = custom.findIndex(x=>x.id===id);
+  if (ci>=0) { custom[ci].faltas={actuales:act,maximo:max}; setCustom(custom); }
+  closeAllDD();
+  refreshCard(id);
+}
+
+// ── CONDICIONES ──
+function toggleCond(id) {
+  document.getElementById('cond-'+id)?.classList.toggle('open');
+}
+function agregarCond(id) {
+  const inp = document.getElementById('cond-inp-'+id);
+  const txt = inp.value.trim(); if (!txt) return;
+  const l = getCondExtra(id); l.push(txt); setCondExtra(id,l);
+  inp.value='';
+  refreshCard(id);
+  setTimeout(()=>document.getElementById('cond-'+id)?.classList.add('open'),10);
+}
+function borrarCond(id, i) {
+  const l = getCondExtra(id); l.splice(i,1); setCondExtra(id,l);
+  refreshCard(id);
+  setTimeout(()=>document.getElementById('cond-'+id)?.classList.add('open'),10);
+}
+
+// ── PROGRAMA ──
+function abrirPrograma(id) {
+  // primero localStorage (subido manualmente), luego data.js
+  const blobUrl = localStorage.getItem('prog_url_'+id)||'';
+  if (blobUrl) { window.open(blobUrl, '_blank'); return; }
+  const m = MATERIAS.find(x=>x.id===id) || getCustom().find(x=>x.id===id);
+  const ruta = m?.programa||'';
+  if (!ruta) { alert('No hay programa cargado para esta materia'); return; }
+  window.open(ruta, '_blank');
+}
+
+function subirPrograma(id) {
+  const input = document.getElementById('prog-file-input');
+  input.onchange = function() {
+    const file = this.files[0]; if (!file) return;
+    const url = URL.createObjectURL(file);
+    setProgUrl(id, url);
+    this.value='';
+    refreshCard(id);
+  };
+  input.click();
+}
+
+// ── PENDIENTES ──
+function buildPendPanel(id) {
+  const lista = getPend(id);
+  const sin = lista.filter(p=>!p.done).length;
+  const items = lista.map((p,i)=>`
+    <li class="pendiente-item ${p.done?'done':''}">
+      <input type="checkbox" ${p.done?'checked':''} onchange="togglePendItem('${id}',${i})">
+      <label onclick="togglePendItem('${id}',${i})">${p.texto}</label>
+      <button class="btn-del" onclick="borrarPend('${id}',${i})">×</button>
+    </li>`).join('');
+  return `
+    <div class="section-label">Pendientes <span>${sin} sin completar</span></div>
+    <ul class="pendientes-lista">${items||'<li style="font-size:0.74rem;color:var(--text-muted);padding:0.25rem 0">Sin pendientes</li>'}</ul>
+    <div class="add-pendiente">
+      <input type="text" id="pi-${id}" placeholder="Agregar tarea..." onkeydown="if(event.key==='Enter')agregarPend('${id}')">
+      <button class="btn-add" onclick="agregarPend('${id}')">+</button>
+    </div>`;
+}
+function togglePendPanel(id) { document.getElementById('pend-'+id)?.classList.toggle('open'); }
+function agregarPend(id) {
+  const inp=document.getElementById('pi-'+id); const txt=inp.value.trim(); if(!txt) return;
+  const l=getPend(id); l.push({texto:txt,done:false}); setPend(id,l); inp.value='';
+  const panel=document.getElementById('pend-'+id);
+  if(panel){panel.innerHTML=buildPendPanel(id);panel.classList.add('open');}
+  // update badge
+  refreshCard(id);
+}
+function togglePendItem(id,i) {
+  const l=getPend(id); l[i].done=!l[i].done; setPend(id,l);
+  const panel=document.getElementById('pend-'+id);
+  if(panel){const wasOpen=panel.classList.contains('open');panel.innerHTML=buildPendPanel(id);if(wasOpen)panel.classList.add('open');}
+  refreshCard(id);
+}
+function borrarPend(id,i) {
+  const l=getPend(id); l.splice(i,1); setPend(id,l);
+  const panel=document.getElementById('pend-'+id);
+  if(panel){const wasOpen=panel.classList.contains('open');panel.innerHTML=buildPendPanel(id);if(wasOpen)panel.classList.add('open');}
+  refreshCard(id);
+}
+
+// ── PARCIALES ──
+function getParcialesExtra(id) { return ls('parciales_extra_'+id)||[]; }
+function setParcialesExtra(id,l) { lsSet('parciales_extra_'+id,l); }
+
+function getTodasParciales(m) {
+  const base = m.parciales||[];
+  const extra = getParcialesExtra(m.id);
+  return [...base,...extra];
+}
+
+function getProximoParcial(m) {
+  const todos = getTodasParciales(m);
+  const futuros = todos.filter(p=>{
+    if(!p.fecha) return false;
+    return diasRestantes(p.fecha)!==null && diasRestantes(p.fecha)>=0;
+  }).sort((a,b)=>diasRestantes(a.fecha)-diasRestantes(b.fecha));
+  return futuros[0]||null;
+}
+
+function abrirModalParciales(id) {
+  const m = getAllMaterias().find(x=>x.id===id);
+  document.getElementById('mp-materia-nombre').textContent = m.nombre;
+  document.getElementById('mp-materia-id').value = id;
+  document.getElementById('mp-nombre').value='';
+  document.getElementById('mp-fecha').value='';
+  renderListaParciales(id);
+  document.getElementById('modal-parcial').classList.add('open');
+}
+
+function renderListaParciales(id) {
+  const m = getAllMaterias().find(x=>x.id===id);
+  const base = m.parciales||[];
+  const extra = getParcialesExtra(id);
+  const todos = [...base.map(p=>({...p,editable:false})),...extra.map(p=>({...p,editable:true}))];
+  const container = document.getElementById('mp-lista-parciales');
+  if(!todos.length){
+    container.innerHTML='<div style="font-size:0.78rem;color:var(--text-muted);text-align:center;padding:0.5rem">Sin parciales cargados</div>';
+    return;
+  }
+  container.innerHTML = todos.map((p,i)=>{
+    const dias = diasRestantes(p.fecha);
+    const esFuturo = dias!==null&&dias>=0;
+    return `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--surface2)">
+      <span style="flex:1;font-size:0.82rem;font-weight:500">${p.nombre}</span>
+      <span style="font-size:0.75rem;color:var(--text-muted)">${p.fecha||'Sin fecha'}</span>
+      ${dias!==null?`<span style="font-size:0.7rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:6px;background:${esFuturo?'var(--success-light)':'var(--surface2)'};color:${esFuturo?'var(--success)':'var(--text-muted)'}">${esFuturo?dias+'d':'Venció'}</span>`:''}
+      ${p.editable?`<button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.72rem" onclick="borrarParcialExtra('${id}',${i-base.length})">×</button>`:'<span style="width:16px"></span>'}
+    </div>`;
+  }).join('');
+}
+
+function guardarParcialPortada() {
+  const id = document.getElementById('mp-materia-id').value;
+  const nombre = document.getElementById('mp-nombre').value.trim();
+  if(!nombre){alert('Ingresá el nombre');return;}
+  const raw = document.getElementById('mp-fecha').value;
+  let fecha='';
+  if(raw){const[y,m,d]=raw.split('-');fecha=`${d}/${m}/${y}`;}
+  const lista = getParcialesExtra(id);
+  lista.push({nombre,fecha,id:slugify(nombre)+'-'+Date.now()});
+  setParcialesExtra(id,lista);
+  document.getElementById('mp-nombre').value='';
+  document.getElementById('mp-fecha').value='';
+  renderListaParciales(id);
+  refreshCard(id);
+}
+
+function borrarParcialExtra(id,i) {
+  const lista = getParcialesExtra(id);
+  lista.splice(i,1);
+  setParcialesExtra(id,lista);
+  renderListaParciales(id);
+  refreshCard(id);
+}
+
+document.getElementById('modal-parcial').addEventListener('click',e=>{if(e.target===document.getElementById('modal-parcial'))cerrarModal('modal-parcial');});
+function getNotas(id) { return ls('notas_'+id)||[]; }
+function setNotas(id,l) { lsSet('notas_'+id,l); }
+
+function buildNotasPanel(id) {
+  const lista = getNotas(id);
+  const items = lista.map((n,i) => {
+    const aprobada = parseFloat(n.nota) >= 4;
+    return `
+      <div class="nota-item">
+        <span class="nota-parcial">${n.parcial}</span>
+        <span class="nota-num ${aprobada?'nota-aprobada':'nota-desaprobada'}">${n.nota}</span>
+        <span class="nota-estado ${aprobada?'ok':'fail'}">${aprobada?'Aprobado':'Desaprobado'}</span>
+        <span class="nota-fecha">${n.fecha||''}</span>
+        <button class="btn-del-nota" onclick="borrarNota('${id}',${i})">×</button>
+      </div>`;
+  }).join('');
+  return `
+    <div class="section-label">Notas de exámenes <span>${lista.length} registradas</span></div>
+    <div>${items||'<div style="font-size:0.74rem;color:var(--text-muted);padding:0.2rem 0">Sin notas registradas</div>'}</div>
+    <div class="add-nota-row">
+      <input class="nota-inp w-name" id="ni-parc-${id}" placeholder="Ej: Parcial 1">
+      <input class="nota-inp w-num" id="ni-nota-${id}" type="number" step="0.5" min="1" max="10" placeholder="Nota">
+      <input class="nota-inp w-date" id="ni-fecha-${id}" type="date">
+      <button class="btn-add-nota" onclick="agregarNota('${id}')">+ Agregar</button>
+    </div>`;
+}
+
+function toggleNotasPanel(id) {
+  document.getElementById('notas-'+id)?.classList.toggle('open');
+}
+
+function agregarNota(id) {
+  const parcial = document.getElementById('ni-parc-'+id)?.value.trim();
+  const nota = document.getElementById('ni-nota-'+id)?.value;
+  const raw = document.getElementById('ni-fecha-'+id)?.value;
+  if (!parcial||!nota) { alert('Completá al menos el nombre y la nota'); return; }
+  let fecha='';
+  if(raw){const[y,m,d]=raw.split('-');fecha=`${d}/${m}/${y}`;}
+  const l=getNotas(id);
+  l.push({parcial,nota:parseFloat(nota),fecha});
+  setNotas(id,l);
+  ['ni-parc-','ni-nota-','ni-fecha-'].forEach(p=>{const el=document.getElementById(p+id);if(el)el.value='';});
+  const panel=document.getElementById('notas-'+id);
+  if(panel){panel.innerHTML=buildNotasPanel(id);panel.classList.add('open');}
+}
+
+function borrarNota(id,i) {
+  const l=getNotas(id);l.splice(i,1);setNotas(id,l);
+  const panel=document.getElementById('notas-'+id);
+  if(panel){const wasOpen=panel.classList.contains('open');panel.innerHTML=buildNotasPanel(id);if(wasOpen)panel.classList.add('open');}
+}
+function abrirModalMateria() {
+  document.getElementById('mm-titulo').textContent='Agregar materia';
+  document.getElementById('mm-id').value='';
+  document.getElementById('mm-nombre').value='';
+  document.getElementById('mm-carrera').value='Medicina';
+  document.getElementById('mm-año').value='1° año';
+  document.getElementById('mm-tipo').value='regular';
+  document.getElementById('mm-cuatri').value='1° cuatrimestre';
+  document.getElementById('mm-fact').value='0';
+  document.getElementById('mm-fmax').value='3';
+  document.getElementById('mm-examen').value='';
+  document.getElementById('mm-btn-del').style.display='none';
+  document.getElementById('modal-materia').classList.add('open');
+}
+
+function abrirEditarMateria(id) {
+  const m = getCustom().find(x=>x.id===id); if (!m) return;
+  document.getElementById('mm-titulo').textContent='Editar materia';
+  document.getElementById('mm-id').value=id;
+  document.getElementById('mm-nombre').value=m.nombre;
+  document.getElementById('mm-carrera').value=m.carrera;
+  document.getElementById('mm-año').value=m.año;
+  document.getElementById('mm-tipo').value=m.tipo;
+  document.getElementById('mm-cuatri').value=m.cuatrimestre;
+  document.getElementById('mm-fact').value=m.faltas?.actuales||0;
+  document.getElementById('mm-fmax').value=m.faltas?.maximo||3;
+  if (m.examen) { const [d,mo,y]=m.examen.split('/'); document.getElementById('mm-examen').value=`${y}-${mo}-${d}`; }
+  else document.getElementById('mm-examen').value='';
+  document.getElementById('mm-btn-del').style.display='inline-block';
+  document.getElementById('modal-materia').classList.add('open');
+}
+
+function guardarMateria() {
+  const nombre=document.getElementById('mm-nombre').value.trim();
+  if (!nombre) { alert('Ingresá el nombre'); return; }
+  const existingId=document.getElementById('mm-id').value;
+  const id=existingId||slugify(nombre)+'-'+Date.now();
+  const raw=document.getElementById('mm-examen').value;
+  let examen='';
+  if (raw) { const [y,mo,d]=raw.split('-'); examen=`${d}/${mo}/${y}`; }
+  const mat = {
+    id, nombre,
+    carrera:document.getElementById('mm-carrera').value,
+    año:document.getElementById('mm-año').value,
+    tipo:document.getElementById('mm-tipo').value,
+    cuatrimestre:document.getElementById('mm-cuatri').value,
+    faltas:{actuales:parseInt(document.getElementById('mm-fact').value)||0, maximo:parseInt(document.getElementById('mm-fmax').value)||3},
+    examen, condiciones:[], parciales:[], programa:'', campus:''
+  };
+  const lista=getCustom();
+  const idx=lista.findIndex(x=>x.id===id);
+  if(idx>=0) lista[idx]=mat; else lista.push(mat);
+  setCustom(lista);
+  cerrarModal('modal-materia');
+  renderMaterias();
+}
+
+function eliminarMateriaCustom() {
+  const id=document.getElementById('mm-id').value; if(!id) return;
+  if(!confirm('¿Eliminar esta materia?')) return;
+  setCustom(getCustom().filter(x=>x.id!==id));
+  cerrarModal('modal-materia');
+  renderMaterias();
+}
+
+document.getElementById('modal-materia').addEventListener('click',e=>{if(e.target===document.getElementById('modal-materia'))cerrarModal('modal-materia');});
+
+// ── MESAS DEL AÑO ──
+const MESAS_2026 = [
+  { label:'Febrero', fecha:'18/02/2026', hasta:'25/02/2026' },
+  { label:'Marzo 1°', fecha:'05/03/2025', hasta:'12/03/2025' },
+  { label:'Marzo 2°', fecha:'16/03/2026', hasta:'23/03/2026' },
+  { label:'Mayo', fecha:'04/05/2026', hasta:'11/05/2026' },
+  { label:'Junio', fecha:'09/06/2026', hasta:'16/06/2026' },
+  { label:'Julio', fecha:'01/07/2026', hasta:'08/07/2026' },
+  { label:'Agosto 1°', fecha:'10/08/2026', hasta:'15/08/2026' },
+  { label:'Agosto 2°', fecha:'20/08/2026', hasta:'26/08/2026' },
+  { label:'Octubre', fecha:'16/10/2026', hasta:'23/10/2026' },
+  { label:'Noviembre', fecha:'06/11/2026', hasta:'13/11/2026' },
+  { label:'Diciembre', fecha:'01/12/2026', hasta:'09/12/2026' },
+];
+
+function renderMesas() {
+  const container = document.getElementById('mesas-chips');
+  if (!container) return;
+  container.innerHTML = MESAS_2026.map(m => {
+    const d = diasRestantes(m.fecha);
+    const pasada = d !== null && d < 0;
+    const proxima = d !== null && d >= 0 && d <= 30;
+    const cls = pasada ? 'mesa-chip pasada' : proxima ? 'mesa-chip proxima' : 'mesa-chip';
+    const diasTxt = d === null ? '' : d < 0 ? 'Pasada' : d === 0 ? 'Hoy' : `${d}d`;
+    return `<div class="${cls}" onclick="asignarMesaAFinal('${m.fecha}')" title="Asignar fecha ${m.fecha} a un final">
+      <span>${m.label}</span>
+      <span>${m.fecha.slice(0,5)}</span>
+      ${diasTxt ? `<span class="mesa-dias">${diasTxt}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function asignarMesaAFinal(fecha) {
+  const lista = getFinales();
+  if (!lista.length) { alert('Primero agregá un final'); return; }
+  if (lista.length === 1) {
+    const[d,m,y]=fecha.split('/');
+    // Convert to input date format for editarFechaFinal
+    lista[0].fecha = fecha; setFinales(lista); renderFinales();
+    return;
+  }
+  // Si hay varios, preguntar cuál
+  const nombres = lista.map((f,i) => `${i+1}. ${f.nombre}`).join('\n');
+  const idx = parseInt(prompt(`¿A cuál final asignás la mesa ${fecha}?\n${nombres}\nIngresá el número:`)) - 1;
+  if (isNaN(idx) || idx < 0 || idx >= lista.length) return;
+  lista[idx].fecha = fecha; setFinales(lista); renderFinales();
+}
+
+// ── FINALES ──
+function getFinales(){return ls('finales')||[];}
+function setFinales(l){lsSet('finales',l);}
+
+function abrirModalFinal(){
+  const sel=document.getElementById('f-materia-id');
+  sel.innerHTML='<option value="">— Elegí una materia —</option>';
+  ['Medicina','Nutrición'].forEach(carr=>{
+    const grp=document.createElement('optgroup');
+    grp.label=carr;
+    TODAS_MATERIAS_PLAN.filter(m=>m.carrera===carr).forEach(m=>{
+      const opt=document.createElement('option');
+      opt.value=m.id; opt.textContent=m.nombre;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  });
+  ['f-fecha','f-nota'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-carrera-display').value='';
+  document.getElementById('modal-final').classList.add('open');
+}
+
+function onSelectMateria(sel){
+  const m=TODAS_MATERIAS_PLAN.find(x=>x.id===sel.value);
+  document.getElementById('f-carrera-display').value=m?m.carrera:'';
+}
+
+function guardarFinal(){
+  const mId=document.getElementById('f-materia-id').value;
+  if(!mId){alert('Elegí una materia');return;}
+  const m=TODAS_MATERIAS_PLAN.find(x=>x.id===mId);
+  const raw=document.getElementById('f-fecha').value;
+  let fecha=''; if(raw){const[y,mo,d]=raw.split('-');fecha=`${d}/${mo}/${y}`;}
+  const nota=document.getElementById('f-nota').value;
+  const modalidad=document.getElementById('f-modalidad').value;
+  const lista=getFinales();
+  if(lista.find(f=>f.planId===mId)){alert('Ya tenés ese final cargado');return;}
+  lista.push({planId:mId, nombre:m.nombre, carrera:m.carrera, modalidad, fecha, nota});
+  setFinales(lista);
+  cerrarModal('modal-final');
+  renderFinales();
+}
+
+function getHistorial(){ return ls('finales_historial')||[]; }
+function setHistorial(l){ lsSet('finales_historial',l); }
+
+function aprobarFinal(idx){
+  const lista=getFinales();
+  const f=lista[idx];
+  if(!f.nota){alert('Cargá la nota antes de aprobar');return;}
+  // Actualizar Plan
+  const planData=JSON.parse(localStorage.getItem('plan_mat_'+f.planId)||'{}');
+  planData.estado='aprobada';
+  planData.nota=parseFloat(f.nota);
+  planData.modalidad=f.modalidad;
+  if(f.fecha) planData.fecha=f.fecha;
+  localStorage.setItem('plan_mat_'+f.planId, JSON.stringify(planData));
+  // Guardar en historial con fecha de aprobación y temario
+  const temas = JSON.parse(localStorage.getItem('final_unidades_'+f.planId)||'[]');
+  const jsonRepaso = localStorage.getItem('final_repaso_json_'+f.planId)||'';
+  const hist = getHistorial();
+  hist.unshift({
+    ...f,
+    fechaAprobacion: new Date().toLocaleDateString('es-AR'),
+    temas,
+    jsonRepaso
+  });
+  setHistorial(hist);
+  // Quitar de activos
+  lista.splice(idx,1);
+  setFinales(lista);
+  renderFinales();
+}
+
+function abrirHistorial(){
+  const hist = getHistorial();
+  const modal = document.getElementById('modal-historial');
+  const container = document.getElementById('historial-container');
+  if(!hist.length){
+    container.innerHTML='<div style="text-align:center;padding:1.5rem;font-size:0.82rem;color:var(--text-muted)">No hay finales aprobados en el historial.</div>';
+  } else {
+    container.innerHTML = hist.map((f,i)=>{
+      const modalLabel = f.modalidad==='libre'?'Libre':f.modalidad==='revalida'?'Reválida':'Regular';
+      const modalCls = f.modalidad==='libre'?'libre':f.modalidad==='revalida'?'revalida':'regular-m';
+      const temasCount = f.temas?.length||0;
+      const aprendidos = f.temas?.filter(t=>t.estado==='aprendido').length||0;
+      return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem;margin-bottom:0.6rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem">
+          <div>
+            <div style="font-weight:600;font-size:0.85rem">${f.nombre}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted)">${f.carrera} · Aprobado el ${f.fechaAprobacion}</div>
+          </div>
+          <div style="display:flex;gap:0.4rem;align-items:center">
+            <span class="modalidad-chip ${modalCls}">${modalLabel}</span>
+            <span style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:1rem;color:var(--success)">${f.nota}</span>
+          </div>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:0.5rem">${temasCount} temas · ${aprendidos} aprendidos · Fecha examen: ${f.fecha||'—'}</div>
+        <div style="display:flex;gap:0.4rem">
+          <button onclick="restaurarFinal(${i})" style="font-size:0.72rem;padding:0.25rem 0.7rem;border-radius:6px;border:1px solid var(--border);background:white;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-muted)">↩ Restaurar a lista</button>
+          <button onclick="borrarHistorial(${i})" style="font-size:0.72rem;padding:0.25rem 0.6rem;border-radius:6px;border:none;background:none;cursor:pointer;color:var(--danger)">× Eliminar</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  modal.classList.add('open');
+}
+
+function restaurarFinal(i){
+  const hist=getHistorial();
+  const f=hist[i];
+  const lista=getFinales();
+  if(lista.find(x=>x.planId===f.planId)){alert('Ya está en la lista activa');return;}
+  // Restaurar temario
+  if(f.temas?.length) localStorage.setItem('final_unidades_'+f.planId, JSON.stringify(f.temas));
+  if(f.jsonRepaso) localStorage.setItem('final_repaso_json_'+f.planId, f.jsonRepaso);
+  // Quitar marca de aprobado en plan
+  const planData=JSON.parse(localStorage.getItem('plan_mat_'+f.planId)||'{}');
+  planData.estado='pendiente';
+  localStorage.setItem('plan_mat_'+f.planId, JSON.stringify(planData));
+  // Agregar a lista activa
+  lista.push({planId:f.planId,nombre:f.nombre,carrera:f.carrera,modalidad:f.modalidad,fecha:f.fecha,nota:f.nota});
+  setFinales(lista);
+  hist.splice(i,1); setHistorial(hist);
+  cerrarModal('modal-historial');
+  renderFinales();
+}
+
+function borrarHistorial(i){
+  if(!confirm('¿Eliminar este registro del historial? No se puede deshacer.'))return;
+  const hist=getHistorial(); hist.splice(i,1); setHistorial(hist);
+  abrirHistorial();
+}
+
+function editarNotaFinal(idx, val){ const l=getFinales(); l[idx].nota=val; setFinales(l); }
+function editarFechaFinal(idx, val){
+  const l=getFinales();
+  if(val){const[y,m,d]=val.split('-');l[idx].fecha=`${d}/${m}/${y}`;}
+  setFinales(l);
+}
+function editarModalidadFinal(idx, val){ const l=getFinales(); l[idx].modalidad=val; setFinales(l); }
+function eliminarFinal(idx){
+  if(!confirm('¿Eliminar este final?'))return;
+  const l=getFinales(); l.splice(idx,1); setFinales(l); renderFinales();
+}
+
+function getMesaLabel(fecha){
+  if(!fecha) return null;
+  const mesa = MESAS_2026.find(m=>m.fecha===fecha);
+  return mesa ? mesa.label : null;
+}
+
+function renderFinales(){
+  const lista=getFinales();
+  const container=document.getElementById('finales-container');
+  if(!lista.length){
+    container.innerHTML='<div class="finales-empty">No tenés finales cargados todavía. Agregá uno con el botón +</div>';
+    return;
+  }
+  container.innerHTML=lista.map((f,i)=>{
+    const d=f.fecha?diasRestantes(f.fecha):null;
+    const mesaLabel=getMesaLabel(f.fecha);
+    const modalCls=f.modalidad==='libre'?'libre':f.modalidad==='revalida'?'revalida':'regular-m';
+    let fechaInput='';
+    if(f.fecha){const[dd,mm,yy]=f.fecha.split('/');fechaInput=`${yy}-${mm}-${dd}`;}
+    return `<div class="final-row">
+      <div>
+        <div class="final-nombre">${f.nombre}</div>
+        <div class="final-carrera">${f.carrera}</div>
+      </div>
+      <select class="modalidad-chip ${modalCls}" onchange="editarModalidadFinal(${i},this.value)" style="border:1px solid var(--border);border-radius:6px;font-size:0.7rem;padding:0.15rem 0.3rem;cursor:pointer">
+        <option value="regular-m" ${f.modalidad==='regular-m'?'selected':''}>Regular</option>
+        <option value="libre" ${f.modalidad==='libre'?'selected':''}>Libre</option>
+        <option value="revalida" ${f.modalidad==='revalida'?'selected':''}>Reválida</option>
+      </select>
+      <input type="date" value="${fechaInput}" onchange="editarFechaFinal(${i},this.value)"
+        style="border:1px solid var(--border);border-radius:6px;font-size:0.72rem;padding:0.15rem 0.35rem;font-family:'DM Sans',sans-serif;background:var(--surface2);outline:none">
+      <input type="number" value="${f.nota||''}" min="1" max="10" step="0.5" placeholder="Nota"
+        onchange="editarNotaFinal(${i},this.value)"
+        style="width:52px;border:1px solid var(--border);border-radius:6px;font-size:0.72rem;padding:0.15rem 0.35rem;text-align:center;font-family:'DM Sans',sans-serif;background:var(--surface2);outline:none">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0.1rem">
+        ${mesaLabel?`<span style="font-size:0.65rem;font-weight:600;color:var(--med-color)">Mesa ${mesaLabel}</span>`:''}
+        ${d!==null?chipDias(d):''}
+      </div>
+      <div style="display:flex;gap:0.35rem;align-items:center">
+        <a href="final.html?id=${f.planId}" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:0.25rem 0.55rem;font-size:0.72rem;cursor:pointer;color:var(--text-muted);text-decoration:none;font-family:'DM Sans',sans-serif" title="Ver temario del final">📝 →</a>
+        <button style="background:var(--success);color:white;border:none;border-radius:6px;padding:0.25rem 0.6rem;font-size:0.72rem;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="aprobarFinal(${i})">✓ Aprobé</button>
+        <button style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.25rem 0.5rem;font-size:0.72rem;cursor:pointer;color:var(--danger)" onclick="eliminarFinal(${i})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('modal-final').addEventListener('click',e=>{if(e.target===document.getElementById('modal-final'))cerrarModal('modal-final');});
+// Copia mínima de los planes para poblar el selector
+const TODAS_MATERIAS_PLAN = [
+  // MEDICINA
+  {id:'med-01',nombre:'Articulación Básico Clínico Com. I',carrera:'Medicina'},
+  {id:'med-02',nombre:'Conc. y Formación del Ser Humano I',carrera:'Medicina'},
+  {id:'med-03',nombre:'Contexto Social Proceso Salud-Enf.',carrera:'Medicina'},
+  {id:'med-04',nombre:'Conc. y Formación del Ser Humano II',carrera:'Medicina'},
+  {id:'med-05',nombre:'Hábitat, Ecología y Salud',carrera:'Medicina'},
+  {id:'med-06',nombre:'Interculturalidad y Salud',carrera:'Medicina'},
+  {id:'med-07',nombre:'Nacimiento, Crecimiento y Desarrollo',carrera:'Medicina'},
+  {id:'med-08',nombre:'Articulación Básico Clínico Com. II',carrera:'Medicina'},
+  {id:'med-09',nombre:'Agentes, Mecanismos y Nutrición',carrera:'Medicina'},
+  {id:'med-10',nombre:'Metodología Inv. Cs. de la Salud',carrera:'Medicina'},
+  {id:'med-11',nombre:'Computación I',carrera:'Medicina'},
+  {id:'med-12',nombre:'Redes, Programas y Sistemas Salud',carrera:'Medicina'},
+  {id:'med-13',nombre:'Computación II',carrera:'Medicina'},
+  {id:'med-14',nombre:'Articulación Básico Clínico Com. III',carrera:'Medicina'},
+  {id:'med-15',nombre:'Epidemiología Clínica y Diagnóstico',carrera:'Medicina'},
+  {id:'med-16',nombre:'Salud Mental',carrera:'Medicina'},
+  {id:'med-17',nombre:'Salud Colectiva y Comunitaria',carrera:'Medicina'},
+  {id:'med-18',nombre:'Inglés para Cs. de la Salud',carrera:'Medicina'},
+  {id:'med-19',nombre:'Electiva I (Idioma I)',carrera:'Medicina'},
+  {id:'med-20',nombre:'Farmacología General',carrera:'Medicina'},
+  {id:'med-21',nombre:'Investigación en Salud',carrera:'Medicina'},
+  {id:'med-22',nombre:'Salud Integral de la Mujer',carrera:'Medicina'},
+  {id:'med-23',nombre:'Medicina Interna y Campos Clín. I',carrera:'Medicina'},
+  {id:'med-24',nombre:'Farmacología Terapéutica',carrera:'Medicina'},
+  {id:'med-25',nombre:'Salud de la Niñez y Adolescencia',carrera:'Medicina'},
+  {id:'med-26',nombre:'Medicina General I',carrera:'Medicina'},
+  {id:'med-27',nombre:'Seguridad del Paciente',carrera:'Medicina'},
+  {id:'med-28',nombre:'Consumos Problemáticos',carrera:'Medicina'},
+  {id:'med-29',nombre:'Medicina Interna y Campos Clín. II',carrera:'Medicina'},
+  {id:'med-30',nombre:'Clínica Quirúrgica y Emergentol.',carrera:'Medicina'},
+  {id:'med-31',nombre:'Medicina Legal y Toxicología',carrera:'Medicina'},
+  {id:'med-32',nombre:'Medicina General II',carrera:'Medicina'},
+  {id:'med-33',nombre:'Electiva II (Idioma II)',carrera:'Medicina'},
+  {id:'med-34',nombre:'Bioética y Derechos Humanos',carrera:'Medicina'},
+  {id:'med-35',nombre:'Salud del Adulto Mayor',carrera:'Medicina'},
+  {id:'med-36',nombre:'Cuidados Paliativos',carrera:'Medicina'},
+  {id:'med-37',nombre:'Diagnóstico por Imagen',carrera:'Medicina'},
+  // NUTRICIÓN
+  {id:'nut-01',nombre:'Matemática',carrera:'Nutrición'},
+  {id:'nut-02',nombre:'Biología',carrera:'Nutrición'},
+  {id:'nut-03',nombre:'Química Básica',carrera:'Nutrición'},
+  {id:'nut-04',nombre:'Informática',carrera:'Nutrición'},
+  {id:'nut-05',nombre:'Física',carrera:'Nutrición'},
+  {id:'nut-06',nombre:'Anatomía y Fisiología',carrera:'Nutrición'},
+  {id:'nut-07',nombre:'Química Biológica',carrera:'Nutrición'},
+  {id:'nut-08',nombre:'Sociología y Antropología',carrera:'Nutrición'},
+  {id:'nut-09',nombre:'Técnica Dietética',carrera:'Nutrición'},
+  {id:'nut-10',nombre:'Nutrición Humana',carrera:'Nutrición'},
+  {id:'nut-11',nombre:'Bromatología',carrera:'Nutrición'},
+  {id:'nut-12',nombre:'Metodología de la Investigación',carrera:'Nutrición'},
+  {id:'nut-13',nombre:'Inglés',carrera:'Nutrición'},
+  {id:'nut-14',nombre:'Microbiología y Parasitología',carrera:'Nutrición'},
+  {id:'nut-15',nombre:'Estadística',carrera:'Nutrición'},
+  {id:'nut-16',nombre:'Técnica Dietoterápica',carrera:'Nutrición'},
+  {id:'nut-17',nombre:'Nutrición Materno Infantil',carrera:'Nutrición'},
+  {id:'nut-18',nombre:'Fisiopatología',carrera:'Nutrición'},
+  {id:'nut-19',nombre:'Epidemiología Nutricional',carrera:'Nutrición'},
+  {id:'nut-20',nombre:'Educación Aliment. y Nutricional',carrera:'Nutrición'},
+  {id:'nut-21',nombre:'Dietoterapia del Adulto',carrera:'Nutrición'},
+  {id:'nut-22',nombre:'Economía Alimentaria',carrera:'Nutrición'},
+  {id:'nut-23',nombre:'Dietoterapia del Niño',carrera:'Nutrición'},
+  {id:'nut-24',nombre:'Evaluación Nutricional',carrera:'Nutrición'},
+  {id:'nut-25',nombre:'Nutrición en Salud Pública',carrera:'Nutrición'},
+  {id:'nut-26',nombre:'Psicología',carrera:'Nutrición'},
+  {id:'nut-27',nombre:'Comunicación Social',carrera:'Nutrición'},
+  {id:'nut-28',nombre:'Farmacología y Nutrición',carrera:'Nutrición'},
+  {id:'nut-29',nombre:'Ética',carrera:'Nutrición'},
+  {id:'nut-30',nombre:'Gestión Servicios de Alimentación',carrera:'Nutrición'},
+  {id:'nut-31',nombre:'Electiva I',carrera:'Nutrición'},
+  {id:'nut-32',nombre:'Políticas Aliment. y Nutricionales',carrera:'Nutrición'},
+  {id:'nut-33',nombre:'Tecnología Alimentaria',carrera:'Nutrición'},
+  {id:'nut-34',nombre:'Electiva II',carrera:'Nutrición'},
+  {id:'nut-pp',nombre:'Prácticas Profesionales',carrera:'Nutrición'},
+  {id:'nut-ts',nombre:'Tesina',carrera:'Nutrición'},
+];
+
+document.getElementById('modal-historial').addEventListener('click',e=>{if(e.target===document.getElementById('modal-historial'))cerrarModal('modal-historial');});
+
+// ── EXPORT / IMPORT ──
+function exportarDatos(){
+  const datos = {};
+  for(let i=0; i<localStorage.length; i++){
+    const key = localStorage.key(i);
+    datos[key] = localStorage.getItem(key);
+  }
+  const json = JSON.stringify(datos, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toLocaleDateString('es-AR').replace(/\//g,'-');
+  a.href = url;
+  a.download = `nexu-backup-${fecha}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarDatos(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const datos = JSON.parse(e.target.result);
+      if(!confirm(`¿Importar backup? Esto va a reemplazar todos tus datos actuales con los del archivo "${file.name}".\n\n¿Estás segura?`)) return;
+      // Limpiar localStorage actual
+      localStorage.clear();
+      // Cargar datos del backup
+      Object.entries(datos).forEach(([k,v]) => localStorage.setItem(k,v));
+      alert('✅ Datos importados correctamente. La app se va a recargar.');
+      location.reload();
+    } catch(err) {
+      alert('❌ El archivo no es válido. Asegurate de que sea un backup de Nexu.');
+    }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+// ── INIT ──
+// Migrar finales viejos que no tienen planId
+(function migrarFinalesViejos(){
+  const lista = getFinales();
+  let cambio = false;
+  lista.forEach((f,i)=>{
+    if(!f.planId && f.nombre){
+      // Buscar match por nombre en el plan
+      const match = TODAS_MATERIAS_PLAN.find(m=>
+        m.nombre.toLowerCase().includes(f.nombre.toLowerCase().slice(0,6)) ||
+        f.nombre.toLowerCase().includes(m.nombre.toLowerCase().slice(0,6))
+      );
+      if(match){ lista[i].planId = match.id; cambio=true; }
+    }
+  });
+  if(cambio) setFinales(lista);
+})();
+renderMaterias();
+renderFinales();
+renderMesas();
+</script>
+</body>
+</html>
