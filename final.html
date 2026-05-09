@@ -127,7 +127,7 @@
 <body>
 <header>
   <div class="logo">Ne<span>xu</span></div>
-  <nav><a href="portada.html">← Inicio</a></nav>
+  <nav><a href="index.html">← Inicio</a></nav>
 </header>
 
 <div class="split">
@@ -250,12 +250,12 @@ function diasRestantes(fecha){
 }
 
 // ── INIT ──
-if(!finalId){ window.location.href='portada.html'; }
+if(!finalId){ window.location.href='index.html'; }
 
 const materia = TODAS_MATERIAS_PLAN.find(m=>m.id===finalId);
 const finalData = getFinales().find(f=>f.planId===finalId);
 
-if(!materia){ document.getElementById('panel-izq').innerHTML='<div style="padding:2rem;color:#c1440e">Final no encontrado. <a href="portada.html">Volver</a></div>'; }
+if(!materia){ document.getElementById('panel-izq').innerHTML='<div style="padding:2rem;color:#c1440e">Final no encontrado. <a href="index.html">Volver</a></div>'; }
 else { renderPanelIzq(); renderPanelDer(); }
 
 // ── PANEL IZQUIERDO ──
@@ -326,7 +326,7 @@ function renderPanelIzq(){
 
   document.getElementById('panel-izq').innerHTML = `
     <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.9rem">
-      <a href="portada.html" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none">← Inicio</a>
+      <a href="index.html" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none">← Inicio</a>
       <span class="chip ${chipCls}">${materia.carrera}</span>
       <span style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800">${materia.nombre}</span>
     </div>

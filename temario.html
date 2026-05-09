@@ -325,7 +325,7 @@
 <header>
   <div class="logo">Ne<span>xu</span></div>
   <nav>
-    <a href="portada.html">← Inicio</a>
+    <a href="index.html">← Inicio</a>
   </nav>
   <div class="date-chip" id="fecha-hoy"></div>
 </header>
@@ -619,7 +619,7 @@ function init() {
   }
   if (!paramMateria || !([...MATERIAS,...getCustomT()].find(m=>m.id===paramMateria))) {
     // Sin materia especificada, volver a inicio
-    window.location.href = 'portada.html';
+    window.location.href = 'index.html';
     return;
   }
   mostrarMateria(paramMateria);
@@ -668,7 +668,7 @@ function buildPanelLeft(m) {
 
   return `
     <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.9rem;flex-wrap:wrap">
-      <a href="portada.html" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;font-family:'DM Sans',sans-serif">← Inicio</a>
+      <a href="index.html" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;font-family:'DM Sans',sans-serif">← Inicio</a>
       <span class="carrera-chip ${chipCls}">${m.carrera}</span>
       <span style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800">${m.nombre}</span>
       ${getCustomT().some(x=>x.id===m.id)?`<button style="background:none;border:none;cursor:pointer;font-size:0.72rem;color:var(--text-muted)" onclick="abrirEditarMateriaT('${m.id}')" title="Editar">✎</button>`:''}
