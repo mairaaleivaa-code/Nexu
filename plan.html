@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de Carrera · Nexu</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f2f1ee; --surface:#fff; --surface2:#f0ede8; --border:#e2ddd6;
+    --text:#1a1714; --text-muted:#8a8077;
+    --med:#2563a8; --med-bg:#dbeeff; --med-border:#93c5fd;
+    --nut:#9b1c3a; --nut-bg:#fde8ee; --nut-border:#f9a8c0;
+    --success:#2d6a4f; --success-light:#d8f3dc;
+    --warning:#b5651d; --warning-light:#fef3e2;
+    --danger:#c1440e; --danger-light:#fce8e0;
+    --promo:#1d6fa4; --promo-light:#dbeeff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.75rem; height:54px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+  .logo { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; }
+  .logo span { color:var(--med); }
+  nav { display:flex; gap:0.2rem; }
+  nav a { text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:500; padding:0.38rem 0.75rem; border-radius:7px; transition:all 0.15s; }
+  nav a:hover, nav a.active { background:var(--surface2); color:var(--text); }
+  .date-chip { font-size:0.72rem; color:var(--text-muted); background:var(--surface2); padding:0.28rem 0.7rem; border-radius:20px; border:1px solid var(--border); }
+
+  main { max-width:1280px; margin:0 auto; padding:1.5rem; }
+  .page-header { margin-bottom:1.5rem; }
+  .page-title { font-family:'Montserrat',sans-serif; font-size:1.35rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:0.25rem; }
+  .page-subtitle { font-size:0.82rem; color:var(--text-muted); }
+
+  /* LAYOUT DOS COLUMNAS */
+  .plan-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; align-items:start; }
+
+  /* COLUMNA CARRERA */
+  .carrera-col {}
+  .carrera-header { display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:2px solid var(--border); }
+  .carrera-header.medicina { border-color:var(--med-border); }
+  .carrera-header.nutricion { border-color:var(--nut-border); }
+  .carrera-badge { font-family:'Montserrat',sans-serif; font-size:0.78rem; font-weight:800; padding:0.35rem 0.9rem; border-radius:20px; letter-spacing:0.04em; text-transform:uppercase; }
+  .badge-med { background:var(--med-bg); color:var(--med); }
+  .badge-nut { background:var(--nut-bg); color:var(--nut); }
+  .carrera-info { font-size:0.75rem; color:var(--text-muted); }
+
+  /* STATS BAR */
+  .stats-bar { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem; margin-bottom:1rem; display:flex; align-items:center; gap:1.25rem; }
+  .stat-item { text-align:center; }
+  .stat-num { font-family:'Montserrat',sans-serif; font-size:1.3rem; font-weight:800; line-height:1; }
+  .stat-num.med { color:var(--med); }
+  .stat-num.nut { color:var(--nut); }
+  .stat-num.success { color:var(--success); }
+  .stat-label { font-size:0.63rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-top:0.15rem; }
+  .progress-wrap { flex:1; }
+  .progress-bg { height:8px; background:var(--surface2); border-radius:10px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:10px; transition:width 0.5s; }
+  .progress-fill.med { background:linear-gradient(90deg,#3b82f6,#1d4ed8); }
+  .progress-fill.nut { background:linear-gradient(90deg,#f472b6,#9b1c3a); }
+  .progress-label { font-size:0.65rem; color:var(--text-muted); margin-top:0.2rem; text-align:right; }
+
+  /* AÑO SECTION */
+  .año-section { margin-bottom:0.75rem; }
+  .año-header { font-family:'Montserrat',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); padding:0.45rem 0.75rem; background:var(--surface2); border-radius:7px; margin-bottom:0.35rem; border-left:3px solid var(--border); }
+  .año-header.medicina { border-color:var(--med-border); color:var(--med); }
+  .año-header.nutricion { border-color:var(--nut-border); color:var(--nut); }
+
+  /* MATERIA ROW */
+  .materia-row { background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:0.3rem; overflow:hidden; transition:box-shadow 0.15s; }
+  .materia-row:hover { box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+  .materia-row.aprobada { border-color:#6ee7b7; background:#f0fdf4; }
+  .materia-row.regular { border-color:#fbbf24; background:#fffbeb; }
+
+  .materia-main { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0.75rem; cursor:pointer; }
+  .cuatri-tag { font-size:0.6rem; font-weight:600; padding:0.12rem 0; border-radius:5px; background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); white-space:nowrap; flex-shrink:0; width:58px; text-align:center; }
+  .materia-check { width:16px; height:16px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; transition:all 0.15s; }
+  .materia-check.aprobada { background:var(--success); border-color:var(--success); color:white; font-size:0.6rem; }
+  .materia-check.regular-estado { background:#fbbf24; border-color:#fbbf24; color:white; font-size:0.6rem; }
+  .materia-nombre { flex:1; font-size:0.78rem; font-weight:500; line-height:1.3; }
+  .materia-nombre.tachada { text-decoration:line-through; color:var(--text-muted); }
+
+  .modalidad-sel { font-family:'DM Sans',sans-serif; font-size:0.62rem; font-weight:600; padding:0.12rem 0.35rem; border-radius:5px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); cursor:pointer; outline:none; }
+  .modalidad-sel.cursando { background:#ede0f7; color:#6d28d9; border-color:#c4b5fd; }
+  .modalidad-sel.por-rendir { background:#fef9c3; color:#92400e; border-color:#fbbf24; }
+  .modalidad-sel.falta { background:#fee2e2; color:#b91c1c; border-color:#f87171; }
+  .modalidad-sel.libre { background:#ccfbf1; color:#0f766e; border-color:#5eead4; }
+  .modalidad-sel.regular-m { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
+  .modalidad-sel.revalida { background:#eef2ff; color:#3730a3; border-color:#818cf8; }
+  .materia-row.por-rendir-row { border-color:#fb923c; background:#fff8f0; }
+  .materia-row.por-rendir-row .materia-nombre { color:#c2410c; font-weight:600; }
+  .materia-row.row-cursando { border-color:#c4b5fd; background:#f5f0ff; }
+  .materia-row.row-cursando .materia-nombre { color:#6d28d9; }
+  .materia-row.row-por-rendir { border-color:#fbbf24; background:#fffbeb; }
+  .materia-row.row-por-rendir .materia-nombre { color:#92400e; }
+  .materia-row.row-falta { border-color:#f87171; background:#fff0f0; }
+  .materia-row.row-falta .materia-nombre { color:#b91c1c; }
+  .materia-row.row-libre { border-color:#5eead4; background:#f0fdfa; }
+  .materia-row.row-libre .materia-nombre { color:#0f766e; }
+  .materia-row.row-regular { border-color:#6ee7b7; background:#f0fdf4; }
+  .materia-row.row-regular .materia-nombre { color:#2d6a4f; }
+  .materia-row.row-revalida { border-color:#818cf8; background:#eef2ff; }
+  .materia-row.row-revalida .materia-nombre { color:#3730a3; }
+  .modalidad-sel.regular-m { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
+  .modalidad-sel.revalida { background:var(--promo-light); color:var(--promo); border-color:#93c5fd; }
+
+  .nota-input { width:38px; border:1px solid var(--border); border-radius:5px; padding:0.12rem 0.3rem; font-size:0.72rem; text-align:center; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; -moz-appearance:textfield; }
+  .nota-input::-webkit-outer-spin-button,.nota-input::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .nota-input:focus { border-color:#93c5fd; background:white; }
+
+  .fecha-input { border:1px solid var(--border); border-radius:5px; padding:0.12rem 0.3rem; font-size:0.68rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; color:var(--text); width:88px; }
+  .fecha-input:focus { border-color:#93c5fd; }
+
+  .chevron-m { font-size:0.6rem; color:var(--text-muted); transition:transform 0.2s; flex-shrink:0; }
+  .chevron-m.open { transform:rotate(180deg); }
+
+  /* CORRELATIVAS PANEL */
+  .corr-panel { display:none; background:var(--surface2); border-top:1px solid var(--border); padding:0.6rem 0.75rem; }
+  .corr-panel.open { display:block; }
+  .corr-title { font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.4rem; }
+  .corr-lista { list-style:none; }
+  .corr-item { display:flex; align-items:center; gap:0.45rem; padding:0.25rem 0; border-bottom:1px solid var(--border); font-size:0.74rem; }
+  .corr-item:last-child { border-bottom:none; }
+  .corr-check { width:13px; height:13px; accent-color:var(--med); cursor:pointer; flex-shrink:0; }
+  .corr-label { flex:1; cursor:pointer; }
+  .corr-label.cumplida { text-decoration:line-through; color:var(--text-muted); }
+  .btn-del-corr { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.7rem; }
+  .add-corr-row { display:flex; gap:0.28rem; margin-top:0.38rem; }
+  .add-corr-inp { flex:1; border:1px solid var(--border); border-radius:5px; padding:0.25rem 0.45rem; font-size:0.71rem; font-family:'DM Sans',sans-serif; background:white; outline:none; }
+  .add-corr-inp:focus { border-color:#93c5fd; }
+  .btn-add-corr { background:white; border:1px solid var(--border); border-radius:5px; padding:0.25rem 0.5rem; font-size:0.72rem; cursor:pointer; color:var(--text-muted); }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.32); z-index:1000; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--surface); border-radius:14px; padding:1.4rem; width:440px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,0.15); }
+  .modal h3 { font-family:'Montserrat',sans-serif; font-size:1rem; font-weight:700; margin-bottom:1rem; }
+  .modal-actions { display:flex; gap:0.45rem; justify-content:flex-end; margin-top:1rem; }
+  .btn-cancel { padding:0.45rem 1rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.8rem; cursor:pointer; color:var(--text-muted); }
+  .btn-save { padding:0.45rem 1rem; border-radius:7px; border:none; background:var(--text); color:white; font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:500; cursor:pointer; }
+
+  @media(max-width:900px) { .plan-grid { grid-template-columns:1fr; } nav { display:none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Ne<span>xu</span></div>
+  <nav>
+    <a href="portada.html">Inicio</a>
+    <a href="plan.html" class="active">Plan</a>
+  </nav>
+  <div class="date-chip" id="fecha-hoy"></div>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1 class="page-title">Plan de carrera</h1>
+    <p class="page-subtitle">Seguimiento de materias · Medicina 6 años · Nutrición 5 años</p>
+  </div>
+
+  <div class="plan-grid">
+    <!-- MEDICINA -->
+    <div class="carrera-col" id="col-medicina">
+      <div class="carrera-header medicina">
+        <span class="carrera-badge badge-med">Medicina</span>
+        <span class="carrera-info">6 años · 38 materias + PFO</span>
+      </div>
+      <div class="stats-bar" id="stats-med"></div>
+      <div id="plan-medicina"></div>
+    </div>
+    <!-- NUTRICIÓN -->
+    <div class="carrera-col" id="col-nutricion">
+      <div class="carrera-header nutricion">
+        <span class="carrera-badge badge-nut">Nutrición</span>
+        <span class="carrera-info">5 años · 34 materias + Prácticas + Tesina</span>
+      </div>
+      <div class="stats-bar" id="stats-nut"></div>
+      <div id="plan-nutricion"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── FECHA ──
+document.getElementById('fecha-hoy').textContent =
+  new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+
+// ── PLAN DE MATERIAS ──
+const PLAN_MEDICINA = [
+  { año: '1° Año', materias: [
+    { id:'med-01', nombre:'Articulación Básico Clínico Com. I', cuatri:'Anual', cursar:['P.I.V.U.C.S.'], rendir:['P.I.V.U.C.S.'] },
+    { id:'med-02', nombre:'Conc. y Formación del Ser Humano I', cuatri:'1° cuatri', cursar:['P.I.V.U.C.S.'], rendir:['P.I.V.U.C.S.'] },
+    { id:'med-03', nombre:'Contexto Social Proceso Salud-Enf.', cuatri:'1° cuatri', cursar:['P.I.V.U.C.S.'], rendir:['P.I.V.U.C.S.'] },
+    { id:'med-04', nombre:'Conc. y Formación del Ser Humano II', cuatri:'2° cuatri', cursar:['Conc. y Form. Ser Humano I (reg.)'], rendir:['Conc. y Form. Ser Humano I (apr.)'] },
+    { id:'med-05', nombre:'Hábitat, Ecología y Salud', cuatri:'2° cuatri', cursar:['Contexto Social (reg.)'], rendir:['Contexto Social (apr.)'] },
+    { id:'med-06', nombre:'Interculturalidad y Salud', cuatri:'2° cuatri', cursar:['Contexto Social (reg.)'], rendir:['Contexto Social (apr.)'] },
+  ]},
+  { año: '2° Año', materias: [
+    { id:'med-07', nombre:'Nacimiento, Crecimiento y Desarrollo', cuatri:'Anual', cursar:['Conc. y Form. II (reg.)'], rendir:['Conc. y Form. I (apr.)','Conc. y Form. II (apr.)'] },
+    { id:'med-08', nombre:'Articulación Básico Clínico Com. II', cuatri:'Anual', cursar:['Articulación I (reg.)'], rendir:['Articulación I (apr.)'] },
+    { id:'med-09', nombre:'Agentes, Mecanismos y Nutrición', cuatri:'Anual', cursar:['Hábitat (reg.)','Contexto Social (apr.)'], rendir:['Hábitat (apr.)'] },
+    { id:'med-10', nombre:'Metodología Inv. Cs. de la Salud', cuatri:'1° cuatri', cursar:['Contexto Social (reg.)','Hábitat (reg.)'], rendir:['Contexto Social (apr.)','Hábitat (apr.)'] },
+    { id:'med-11', nombre:'Computación I', cuatri:'1° cuatri', cursar:['P.I.V.U.C.S.'], rendir:['—'] },
+    { id:'med-12', nombre:'Redes, Programas y Sistemas Salud', cuatri:'2° cuatri', cursar:['Interculturalidad (apr.)'], rendir:['Metodología Inv. (apr.)'] },
+    { id:'med-13', nombre:'Computación II', cuatri:'2° cuatri', cursar:['Computación I (reg.)'], rendir:['Computación I (apr.)'] },
+  ]},
+  { año: '3° Año', materias: [
+    { id:'med-14', nombre:'Articulación Básico Clínico Com. III', cuatri:'Anual', cursar:['ABCC II (reg.)','Articulación I (apr.)'], rendir:['ABCC II (apr.)'] },
+    { id:'med-15', nombre:'Epidemiología Clínica y Diagnóstico', cuatri:'Anual', cursar:['ABCC II (reg.)','Agentes (reg.)','Contexto Social (apr.)','Hábitat (apr.)'], rendir:['ABCC II (apr.)','Agentes (apr.)'] },
+    { id:'med-16', nombre:'Salud Mental', cuatri:'1° cuatri', cursar:['Computación II (reg.)','Contexto Social (apr.)','Hábitat (apr.)','Interculturalidad (apr.)'], rendir:['Computación II (apr.)'] },
+    { id:'med-17', nombre:'Salud Colectiva y Comunitaria', cuatri:'1° cuatri', cursar:['Computación II (reg.)','Contexto Social (apr.)','Hábitat (apr.)','Interculturalidad (apr.)'], rendir:['Computación II (apr.)'] },
+    { id:'med-18', nombre:'Inglés para Cs. de la Salud', cuatri:'1° cuatri', cursar:['ABCC II (reg.)'], rendir:['Articulación I (apr.)'] },
+    { id:'med-19', nombre:'Electiva I (Idioma I)', cuatri:'1° cuatri', cursar:['ABCC II (reg.)'], rendir:['Articulación I (apr.)'] },
+    { id:'med-20', nombre:'Farmacología General', cuatri:'2° cuatri', cursar:['ABCC II (reg.)','Agentes (reg.)','Articulación I (apr.)'], rendir:['Agentes (apr.)'] },
+    { id:'med-21', nombre:'Investigación en Salud', cuatri:'2° cuatri', cursar:['Metodología Inv. (reg.)'], rendir:['Metodología Inv. (apr.)'] },
+  ]},
+  { año: '4° Año', materias: [
+    { id:'med-22', nombre:'Salud Integral de la Mujer', cuatri:'Anual', cursar:['ABCC III (reg.)','Farm. General (reg.)','Articulación I (apr.)','Conc. y Form. I (apr.)','Agentes (apr.)'], rendir:['Farm. General (apr.)'] },
+    { id:'med-23', nombre:'Medicina Interna y Campos Clín. I', cuatri:'Anual', cursar:['ABCC III (reg.)','Farm. General (reg.)','ABCC II (apr.)'], rendir:['ABCC III (apr.)'] },
+    { id:'med-24', nombre:'Farmacología Terapéutica', cuatri:'Anual', cursar:['ABCC III (reg.)','Farm. General (reg.)','Agentes (apr.)'], rendir:['Farm. General (apr.)'] },
+    { id:'med-25', nombre:'Salud de la Niñez y Adolescencia', cuatri:'Anual', cursar:['Epid. Clínica (reg.)','Farm. General (reg.)','Nacimiento (apr.)'], rendir:['Epid. Clínica (apr.)'] },
+    { id:'med-26', nombre:'Medicina General I', cuatri:'1° cuatri', cursar:['Epid. Clínica (reg.)','Salud Mental (reg.)','Epid. Clínica (apr.)'], rendir:['Epid. Clínica (apr.)','Salud Mental (apr.)'] },
+    { id:'med-27', nombre:'Seguridad del Paciente', cuatri:'1° cuatri', cursar:['ABCC III (reg.)'], rendir:['ABCC III (apr.)'] },
+    { id:'med-28', nombre:'Consumos Problemáticos', cuatri:'2° cuatri', cursar:['Salud Mental (reg.)','Salud Colectiva (reg.)'], rendir:['Salud Mental (apr.)','Salud Colectiva (apr.)'] },
+  ]},
+  { año: '5° Año', materias: [
+    { id:'med-29', nombre:'Medicina Interna y Campos Clín. II', cuatri:'Anual', cursar:['Med. Interna I (reg.)','Farm. Terapéutica (apr.)'], rendir:['Med. Interna I (apr.)','Farm. Terapéutica (apr.)'] },
+    { id:'med-30', nombre:'Clínica Quirúrgica y Emergentol.', cuatri:'Anual', cursar:['Med. Interna I (reg.)','Salud Niñez (reg.)','Med. General I (reg.)','Farm. Terapéutica (apr.)'], rendir:['Farm. Terapéutica (apr.)','Med. General I (apr.)'] },
+    { id:'med-31', nombre:'Medicina Legal y Toxicología', cuatri:'1° cuatri', cursar:['Med. Interna I (reg.)','Salud Niñez (reg.)','Seguridad Paciente (reg.)','ABCC III (apr.)','Inglés (apr.)'], rendir:['Med. Interna I (apr.)','Salud Niñez (apr.)'] },
+    { id:'med-32', nombre:'Medicina General II', cuatri:'1° cuatri', cursar:['Salud Mujer (reg.)','Salud Niñez (reg.)','Med. Interna I (reg.)','Salud Colectiva (apr.)','Epid. Clínica (apr.)','Farm. General (apr.)'], rendir:['Salud Mujer (apr.)','Salud Niñez (apr.)','Med. Interna I (apr.)'] },
+    { id:'med-33', nombre:'Electiva II (Idioma II)', cuatri:'1° cuatri', cursar:['Electiva I (apr.)'], rendir:['—'] },
+    { id:'med-34', nombre:'Bioética y Derechos Humanos', cuatri:'2° cuatri', cursar:['Seguridad Paciente (reg.)'], rendir:['Seguridad Paciente (apr.)'] },
+    { id:'med-35', nombre:'Salud del Adulto Mayor', cuatri:'2° cuatri', cursar:['Med. Interna I (reg.)','Clínica Quirúrgica (reg.)'], rendir:['Med. Interna I (apr.)','Clínica Quirúrgica (apr.)'] },
+    { id:'med-36', nombre:'Cuidados Paliativos', cuatri:'2° cuatri', cursar:['Consumos Problemáticos (reg.)'], rendir:['Consumos Problemáticos (apr.)'] },
+    { id:'med-37', nombre:'Diagnóstico por Imagen', cuatri:'2° cuatri', cursar:['Med. Interna I (reg.)'], rendir:['Med. Interna I (apr.)'] },
+  ]},
+  { año: '6° Año — Práctica Final Obligatoria', materias: [
+    { id:'med-38a', nombre:'PFO: Clínica Médica', cuatri:'Anual', cursar:['Materias 29 a 37 aprobadas'], rendir:['Materias 29 a 37 aprobadas'] },
+    { id:'med-38b', nombre:'PFO: Clínica Pediátrica', cuatri:'Anual', cursar:['Materias 29 a 37 aprobadas'], rendir:['Materias 29 a 37 aprobadas'] },
+    { id:'med-38c', nombre:'PFO: Clínica Gineco-Obstétrica', cuatri:'Anual', cursar:['Materias 29 a 37 aprobadas'], rendir:['Materias 29 a 37 aprobadas'] },
+    { id:'med-38d', nombre:'PFO: Clínica Quirúrgica', cuatri:'Anual', cursar:['Materias 29 a 37 aprobadas'], rendir:['Materias 29 a 37 aprobadas'] },
+  ]},
+];
+
+
+const PLAN_NUTRICION = [
+  { año: '1° Año', materias: [
+    { id:'nut-01', nombre:'Matemática', cuatri:'1° cuatri', cursar:[], rendir:[] },
+    { id:'nut-02', nombre:'Biología', cuatri:'1° cuatri', cursar:[], rendir:[] },
+    { id:'nut-03', nombre:'Química Básica', cuatri:'1° cuatri', cursar:[], rendir:[] },
+    { id:'nut-04', nombre:'Informática', cuatri:'2° cuatri', cursar:[], rendir:[] },
+    { id:'nut-05', nombre:'Física', cuatri:'2° cuatri', cursar:['Matemática (reg.)'], rendir:['Matemática (apr.)','Química Básica (apr.)'] },
+    { id:'nut-06', nombre:'Anatomía y Fisiología', cuatri:'2° cuatri', cursar:['Biología (apr.)'], rendir:['Biología (apr.)'] },
+    { id:'nut-07', nombre:'Química Biológica', cuatri:'2° cuatri', cursar:['Biología (reg.)','Química Básica (reg.)'], rendir:['Biología (apr.)','Química Básica (apr.)'] },
+    { id:'nut-08', nombre:'Sociología y Antropología', cuatri:'2° cuatri', cursar:[], rendir:[] },
+  ]},
+  { año: '2° Año', materias: [
+    { id:'nut-09', nombre:'Técnica Dietética', cuatri:'Anual', cursar:['Química Biológica (reg.)','Física (reg.)','Biología (apr.)'], rendir:['Química Biológica (apr.)','Física (apr.)'] },
+    { id:'nut-10', nombre:'Nutrición Humana', cuatri:'Anual', cursar:['Química Biológica (reg.)','Física (reg.)','Biología (apr.)'], rendir:['Química Biológica (apr.)','Física (apr.)'] },
+    { id:'nut-11', nombre:'Bromatología', cuatri:'1° cuatri', cursar:['Química Biológica (reg.)','Biología (apr.)'], rendir:['Química Biológica (apr.)'] },
+    { id:'nut-12', nombre:'Metodología de la Investigación', cuatri:'1° cuatri', cursar:['Informática (reg.)','Sociología (apr.)'], rendir:['Informática (apr.)'] },
+    { id:'nut-13', nombre:'Inglés', cuatri:'2° cuatri', cursar:['Informática (reg.)','Biología (apr.)'], rendir:['Informática (apr.)'] },
+    { id:'nut-14', nombre:'Microbiología y Parasitología', cuatri:'2° cuatri', cursar:['Química Biológica (reg.)','Física (reg.)','Biología (apr.)'], rendir:['Química Biológica (apr.)','Biología (apr.)'] },
+    { id:'nut-15', nombre:'Estadística', cuatri:'2° cuatri', cursar:['Metodología (reg.)','Matemática a Física (apr.)'], rendir:['Metodología (apr.)'] },
+  ]},
+  { año: '3° Año', materias: [
+    { id:'nut-16', nombre:'Técnica Dietoterápica', cuatri:'Anual', cursar:['Técnica Dietética (reg.)','Nutrición Humana (apr.)'], rendir:['Técnica Dietética (apr.)','Nutrición Humana (apr.)'] },
+    { id:'nut-17', nombre:'Nutrición Materno Infantil', cuatri:'1° cuatri', cursar:['Nutrición Humana (reg.)','Anatomía y Fisiología (apr.)'], rendir:['Nutrición Humana (apr.)'] },
+    { id:'nut-18', nombre:'Fisiopatología', cuatri:'1° cuatri', cursar:['Nutrición Humana (reg.)','Anatomía y Fisiología (apr.)'], rendir:['Nutrición Humana (apr.)'] },
+    { id:'nut-19', nombre:'Epidemiología Nutricional', cuatri:'1° cuatri', cursar:['Estadística (reg.)','Nutrición Humana (reg.)','Metodología (apr.)'], rendir:['Estadística (apr.)','Nutrición Humana (apr.)'] },
+    { id:'nut-20', nombre:'Educación Aliment. y Nutricional', cuatri:'1° cuatri', cursar:['Técnica Dietética (reg.)','Nutrición Humana (reg.)','Inglés (apr.)'], rendir:['Técnica Dietética (apr.)','Nutrición Humana (apr.)'] },
+    { id:'nut-21', nombre:'Dietoterapia del Adulto', cuatri:'2° cuatri', cursar:['Fisiopatología (reg.)','Nutrición Humana (apr.)'], rendir:['Fisiopatología (apr.)','Técnica Dietoterápica (apr.)'] },
+    { id:'nut-22', nombre:'Economía Alimentaria', cuatri:'2° cuatri', cursar:['Nutrición Humana (reg.)','Estadística (apr.)'], rendir:['Nutrición Humana (apr.)'] },
+    { id:'nut-23', nombre:'Dietoterapia del Niño', cuatri:'2° cuatri', cursar:['Nut. Materno Infantil (reg.)','Nutrición Humana (apr.)'], rendir:['Nut. Materno Infantil (apr.)','Nutrición Humana (apr.)'] },
+  ]},
+  { año: '4° Año', materias: [
+    { id:'nut-24', nombre:'Evaluación Nutricional', cuatri:'1° cuatri', cursar:['Diet. Adulto (reg.)','Epidemiología Nut. (reg.)','Estadística (reg.)','Nutrición Humana (apr.)','Diet. Niño (apr.)'], rendir:['Diet. Adulto (apr.)','Epidemiología Nut. (apr.)','Estadística (apr.)'] },
+    { id:'nut-25', nombre:'Nutrición en Salud Pública', cuatri:'1° cuatri', cursar:['Diet. Adulto (reg.)','Epidemiología Nut. (reg.)','Economía Alimentaria (apr.)'], rendir:['Diet. Adulto (apr.)','Epidemiología Nut. (apr.)'] },
+    { id:'nut-26', nombre:'Psicología', cuatri:'1° cuatri', cursar:['Nutrición Humana (reg.)','Metodología (apr.)'], rendir:['Nutrición Humana (apr.)'] },
+    { id:'nut-27', nombre:'Comunicación Social', cuatri:'1° cuatri', cursar:['Nutrición Humana (reg.)','Metodología (apr.)'], rendir:['Nutrición Humana (apr.)'] },
+    { id:'nut-28', nombre:'Farmacología y Nutrición', cuatri:'2° cuatri', cursar:['Evaluación Nutricional (reg.)','Fisiopatología (apr.)'], rendir:['Evaluación Nutricional (apr.)'] },
+    { id:'nut-29', nombre:'Ética', cuatri:'2° cuatri', cursar:['Diet. Adulto (reg.)','Epidemiología Nut. (reg.)'], rendir:['Diet. Adulto (apr.)','Epidemiología Nut. (apr.)'] },
+    { id:'nut-30', nombre:'Gestión Servicios de Alimentación', cuatri:'2° cuatri', cursar:['Evaluación Nutricional (reg.)','Economía Alimentaria (apr.)'], rendir:['Evaluación Nutricional (apr.)'] },
+    { id:'nut-31', nombre:'Electiva I', cuatri:'2° cuatri', cursar:['Comunicación Social (reg.)'], rendir:['Informática (apr.)'] },
+  ]},
+  { año: '5° Año', materias: [
+    { id:'nut-32', nombre:'Políticas Aliment. y Nutricionales', cuatri:'1° cuatri', cursar:['Nut. Salud Pública (reg.)','Economía Alimentaria (apr.)'], rendir:['Nut. Salud Pública (apr.)','Economía Alimentaria (apr.)'] },
+    { id:'nut-33', nombre:'Tecnología Alimentaria', cuatri:'1° cuatri', cursar:['Nut. Salud Pública (reg.)','Bromatología (apr.)','Economía Alimentaria (apr.)'], rendir:['Nut. Salud Pública (apr.)','Economía Alimentaria (apr.)'] },
+    { id:'nut-34', nombre:'Electiva II', cuatri:'1° cuatri', cursar:['Nut. Salud Pública (reg.)','Bromatología o Economía (apr.)'], rendir:['Nut. Salud Pública (apr.)'] },
+    { id:'nut-pp', nombre:'Prácticas Profesionales', cuatri:'Anual', cursar:['Gestión Servicios (reg.)','Psicología (reg.)','Com. Social (reg.)','Farm. y Nutrición (reg.)'], rendir:[] },
+    { id:'nut-ts', nombre:'Tesina', cuatri:'Anual', cursar:[], rendir:['Todas las asignaturas aprobadas'] },
+  ]},
+];
+
+
+// ── STORAGE ──
+function ls(k) { try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;} }
+function lsSet(k,v) { localStorage.setItem(k,JSON.stringify(v)); }
+function getMatData(id) { return ls('plan_mat_'+id)||{estado:'pendiente',modalidad:'',nota:'',fecha:'',corrCumplidas:{}}; }
+function setMatData(id,d) { lsSet('plan_mat_'+id,d); }
+function getCorrExtra(id) { return ls('plan_corr_'+id)||[]; }
+function setCorrExtra(id,l) { lsSet('plan_corr_'+id,l); }
+
+// ── RENDER ──
+function renderPlan(plan, containerId, tipo) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  plan.forEach(bloque => {
+    const sec = document.createElement('div');
+    sec.className = 'año-section';
+    sec.innerHTML = `<div class="año-header ${tipo}">${bloque.año}</div>`;
+    bloque.materias.forEach(m => {
+      sec.insertAdjacentHTML('beforeend', buildMatRow(m, tipo));
+    });
+    container.appendChild(sec);
+  });
+  updateStats(plan, tipo);
+}
+
+function buildMatRow(m, tipo) {
+  const d = getMatData(m.id);
+  const corrExtra = getCorrExtra(m.id);
+  // Support both old correlativas and new cursar/rendir format
+  const cursarBase = m.cursar || m.correlativas || [];
+  const rendirBase = m.rendir || [];
+  const hasDiff = rendirBase.length > 0;
+
+  const corrItems = hasDiff ? `
+    ${cursarBase.length>0 ? `
+      <div class="corr-title" style="color:var(--med);margin-top:0.25rem">📚 Para cursar</div>
+      <ul class="corr-lista">
+        ${cursarBase.map((c,i)=>{
+          const cid='cursar-'+i; const cumplida=d.corrCumplidas?.[cid]||false;
+          return `<li class="corr-item">
+            <input type="checkbox" class="corr-check" ${cumplida?'checked':''} onchange="toggleCorr('${m.id}','${cid}',this.checked)">
+            <label class="corr-label ${cumplida?'cumplida':''}">${c}</label>
+          </li>`;
+        }).join('')}
+      </ul>` : ''}
+    ${rendirBase.length>0 ? `
+      <div class="corr-title" style="color:var(--nut);margin-top:0.5rem">🎯 Para rendir</div>
+      <ul class="corr-lista">
+        ${rendirBase.map((c,i)=>{
+          const cid='rendir-'+i; const cumplida=d.corrCumplidas?.[cid]||false;
+          return `<li class="corr-item">
+            <input type="checkbox" class="corr-check" ${cumplida?'checked':''} onchange="toggleCorr('${m.id}','${cid}',this.checked)">
+            <label class="corr-label ${cumplida?'cumplida':''}">${c}</label>
+          </li>`;
+        }).join('')}
+      </ul>` : ''}
+    ${corrExtra.map((c,i)=>{
+      const cid='extra-'+i; const cumplida=d.corrCumplidas?.[cid]||false;
+      return `<li class="corr-item">
+        <input type="checkbox" class="corr-check" ${cumplida?'checked':''} onchange="toggleCorr('${m.id}','${cid}',this.checked)">
+        <label class="corr-label ${cumplida?'cumplida':''}">${c}</label>
+        <button class="btn-del-corr" onclick="delCorrExtra('${m.id}',${i})">×</button>
+      </li>`;
+    }).join('')}
+  ` : [
+    ...cursarBase.map((c,i)=>({txt:c,id:'base-'+i,base:true})),
+    ...corrExtra.map((c,i)=>({txt:c,id:'extra-'+i,base:false}))
+  ].map((c,i)=>`<li class="corr-item">
+    <input type="checkbox" class="corr-check" ${d.corrCumplidas?.[c.id]?'checked':''} onchange="toggleCorr('${m.id}','${c.id}',this.checked)">
+    <label class="corr-label ${d.corrCumplidas?.[c.id]?'cumplida':''}">${c.txt}</label>
+    ${!c.base?`<button class="btn-del-corr" onclick="delCorrExtra('${m.id}',${i-cursarBase.length})">×</button>`:''}
+  </li>`).join('');
+
+  const hasCorr = cursarBase.length>0 || rendirBase.length>0 || corrExtra.length>0;
+  const aprobada = d.estado === 'aprobada';
+  const modalRowCls = {
+    'cursando': 'row-cursando',
+    'por-rendir': 'row-por-rendir',
+    'falta': 'row-falta',
+    'libre': 'row-libre',
+    'regular-m': 'row-regular',
+    'revalida': 'row-revalida',
+  }[d.modalidad] || '';
+  const rowCls = aprobada ? 'aprobada' : modalRowCls;
+  const checkCls = aprobada ? 'aprobada' : '';
+  const checkSymbol = aprobada ? '✓' : '';
+  const nameCls = aprobada ? 'tachada' : '';
+  const modalCls = {cursando:'cursando','por-rendir':'por-rendir',falta:'falta',libre:'libre','regular-m':'regular-m',revalida:'revalida'}[d.modalidad]||'';
+
+  const corrItemsHTML = corrItems;
+
+  return `<div class="materia-row ${rowCls}" id="row-${m.id}">
+    <div class="materia-main">
+      <div class="materia-check ${checkCls}" onclick="toggleEstado('${m.id}','${tipo}')" title="Clic para marcar aprobada">${checkSymbol}</div>
+      <span class="materia-nombre ${nameCls}">${m.nombre}</span>
+      ${m.cuatri ? `<span class="cuatri-tag">${m.cuatri}</span>` : '<span class="cuatri-tag" style="visibility:hidden">—</span>'}
+      <select class="modalidad-sel ${modalCls}" onchange="setModalidad('${m.id}','${tipo}',this)" onclick="event.stopPropagation()">
+        <option value="" ${!d.modalidad?'selected':''}>—</option>
+        <option value="cursando" ${d.modalidad==='cursando'?'selected':''}>Cursando</option>
+        <option value="regular-m" ${d.modalidad==='regular-m'?'selected':''}>Regular</option>
+        <option value="por-rendir" ${d.modalidad==='por-rendir'?'selected':''}>Por rendir</option>
+        <option value="falta" ${d.modalidad==='falta'?'selected':''}>Falta</option>
+        <option value="libre" ${d.modalidad==='libre'?'selected':''}>Libre</option>
+        <option value="revalida" ${d.modalidad==='revalida'?'selected':''}>Reválida</option>
+      </select>
+      <input type="number" class="nota-input" value="${d.nota||''}" min="1" max="10" step="0.5" placeholder="—"
+        onchange="setNota('${m.id}','${tipo}',this.value)" onclick="event.stopPropagation()" title="Nota">
+      <input type="date" class="fecha-input" value="${d.fecha||''}"
+        onchange="setFecha('${m.id}','${tipo}',this.value)" onclick="event.stopPropagation()" title="Fecha">
+      ${hasCorr?`<span class="chevron-m" id="chev-${m.id}" onclick="toggleCorr_panel('${m.id}')">▼</span>`:'<span class="chevron-m" style="visibility:hidden">▼</span>'}
+    </div>
+    <div class="corr-panel" id="corr-${m.id}">
+      ${corrItemsHTML}
+      <div class="add-corr-row">
+        <input class="add-corr-inp" id="corr-inp-${m.id}" placeholder="Agregar nota extra..." onkeydown="if(event.key==='Enter')addCorrExtra('${m.id}','${tipo}')">
+        <button class="btn-add-corr" onclick="addCorrExtra('${m.id}','${tipo}')">+</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCorr_panel(id) {
+  document.getElementById('corr-'+id)?.classList.toggle('open');
+  document.getElementById('chev-'+id)?.classList.toggle('open');
+}
+
+function toggleEstado(id, tipo) {
+  const d = getMatData(id);
+  d.estado = d.estado === 'aprobada' ? 'pendiente' : 'aprobada';
+  setMatData(id, d);
+  refreshRow(id, tipo);
+  updateStatsByTipo(tipo);
+}
+
+function setModalidad(id, tipo, sel) {
+  const d = getMatData(id); d.modalidad = sel.value; setMatData(id, d);
+  const cls = {cursando:'cursando','por-rendir':'por-rendir',falta:'falta',libre:'libre','regular-m':'regular-m',revalida:'revalida'}[sel.value]||'';
+  sel.className = 'modalidad-sel ' + cls;
+  refreshRow(id, tipo);
+  updateStatsByTipo(tipo);
+}
+
+function setNota(id, tipo, val) {
+  const d = getMatData(id); d.nota = val; setMatData(id, d);
+  updateStatsByTipo(tipo);
+}
+
+function setFecha(id, tipo, val) {
+  const d = getMatData(id); d.fecha = val; setMatData(id, d);
+}
+
+function toggleCorr(id, corrId, checked) {
+  const d = getMatData(id);
+  if (!d.corrCumplidas) d.corrCumplidas = {};
+  d.corrCumplidas[corrId] = checked;
+  setMatData(id, d);
+  // update label style
+  const row = document.getElementById('corr-'+id);
+  if (row) {
+    const items = row.querySelectorAll('.corr-item');
+    items.forEach(item => {
+      const cb = item.querySelector('.corr-check');
+      const lbl = item.querySelector('.corr-label');
+      if (lbl) lbl.classList.toggle('cumplida', cb?.checked);
+    });
+  }
+}
+
+function addCorrExtra(id, tipo) {
+  const inp = document.getElementById('corr-inp-'+id);
+  const txt = inp?.value.trim(); if (!txt) return;
+  const l = getCorrExtra(id); l.push(txt); setCorrExtra(id, l);
+  inp.value = '';
+  refreshRow(id, tipo);
+  setTimeout(() => document.getElementById('corr-'+id)?.classList.add('open'), 10);
+}
+
+function delCorrExtra(id, i) {
+  const l = getCorrExtra(id); l.splice(i, 1); setCorrExtra(id, l);
+  const tipo = id.startsWith('med') ? 'medicina' : 'nutricion';
+  refreshRow(id, tipo);
+  setTimeout(() => document.getElementById('corr-'+id)?.classList.add('open'), 10);
+}
+
+function refreshRow(id, tipo) {
+  const plan = tipo === 'medicina' ? PLAN_MEDICINA : PLAN_NUTRICION;
+  let materia = null;
+  for (const bloque of plan) {
+    materia = bloque.materias.find(m => m.id === id);
+    if (materia) break;
+  }
+  if (!materia) return;
+  const row = document.getElementById('row-'+id);
+  const corrOpen = document.getElementById('corr-'+id)?.classList.contains('open');
+  if (row) {
+    row.outerHTML = buildMatRow(materia, tipo);
+    if (corrOpen) {
+      document.getElementById('corr-'+id)?.classList.add('open');
+      document.getElementById('chev-'+id)?.classList.add('open');
+    }
+  }
+}
+
+// ── STATS ──
+function updateStatsByTipo(tipo) {
+  const plan = tipo === 'medicina' ? PLAN_MEDICINA : PLAN_NUTRICION;
+  updateStats(plan, tipo);
+}
+
+function updateStats(plan, tipo) {
+  const todas = plan.flatMap(b => b.materias);
+  const paraProm = tipo === 'medicina'
+    ? todas.filter(m => !m.id.startsWith('med-38'))
+    : todas;
+  const total = todas.length;
+  const aprobadas = todas.filter(m => getMatData(m.id).estado === 'aprobada').length;
+  const cursando = todas.filter(m => getMatData(m.id).modalidad === 'cursando').length;
+  const pendientes = total - aprobadas;
+  const pct = total > 0 ? Math.round(aprobadas/total*100) : 0;
+
+  const conNota = paraProm.filter(m => {
+    const d = getMatData(m.id);
+    return d.estado === 'aprobada' && d.nota && parseFloat(d.nota) > 0;
+  });
+  const promedio = conNota.length > 0
+    ? (conNota.reduce((acc,m) => acc + parseFloat(getMatData(m.id).nota), 0) / conNota.length).toFixed(2)
+    : null;
+
+  const statsId = tipo === 'medicina' ? 'stats-med' : 'stats-nut';
+  const cls = tipo === 'medicina' ? 'med' : 'nut';
+
+  document.getElementById(statsId).innerHTML = `
+    <div class="stat-item">
+      <div class="stat-num success">${aprobadas}</div>
+      <div class="stat-label">Aprobadas</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:#6d28d9">${cursando}</div>
+      <div class="stat-label">Cursando</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--text-muted)">${pendientes}</div>
+      <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num ${cls}">${total}</div>
+      <div class="stat-label">Total</div>
+    </div>
+    ${promedio ? `
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--promo)">${promedio}</div>
+      <div class="stat-label">Promedio</div>
+    </div>` : ''}
+    <div class="progress-wrap">
+      <div class="progress-bg">
+        <div class="progress-fill ${cls}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-label">${aprobadas}/${total} aprobadas · ${cursando} cursando · ${pct}%${promedio ? ` · Prom. ${promedio}` : ''}</div>
+    </div>
+  `;
+}
+
+// ── INIT ──
+renderPlan(PLAN_MEDICINA, 'plan-medicina', 'medicina');
+renderPlan(PLAN_NUTRICION, 'plan-nutricion', 'nutricion');
+</script>
+</body>
+</html>

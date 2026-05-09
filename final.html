@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final · Nexu</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f2f1ee; --surface:#fff; --surface2:#f0ede8; --border:#e2ddd6;
+    --text:#1a1714; --text-muted:#8a8077;
+    --med-color:#2563a8; --med-bg:#dbeeff; --med-border:#93c5fd;
+    --nut-color:#9b1c3a; --nut-bg:#fde8ee; --nut-border:#f9a8c0;
+    --success:#2d6a4f; --success-light:#d8f3dc;
+    --danger:#c1440e; --danger-light:#fce8e0;
+    --warning:#b5651d;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); }
+
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.75rem; height:54px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+  .logo { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; }
+  .logo span { color:var(--med-color); }
+  nav a { text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:500; padding:0.38rem 0.75rem; border-radius:7px; }
+  nav a:hover { background:var(--surface2); color:var(--text); }
+
+  .split { display:grid; grid-template-columns:1fr 1fr; max-width:1280px; margin:0 auto; min-height:calc(100vh - 54px); }
+  .panel { padding:1.25rem 1.5rem; overflow-y:auto; height:calc(100vh - 54px); }
+  .panel-left { border-right:1px solid var(--border); background:var(--surface); }
+  .panel-right { background:var(--bg); }
+
+  /* META */
+  .meta-header { margin-bottom:1rem; }
+  .mat-title { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; margin-bottom:0.35rem; }
+  .meta-chips { display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; margin-bottom:0.75rem; }
+  .chip { font-size:0.68rem; font-weight:600; padding:0.2rem 0.55rem; border-radius:6px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); }
+  .chip.med { background:var(--med-bg); color:var(--med-color); border-color:var(--med-border); }
+  .chip.nut { background:var(--nut-bg); color:var(--nut-color); border-color:var(--nut-border); }
+
+  /* PROGRESO */
+  .prog-bar-bg { height:6px; background:var(--surface2); border-radius:10px; overflow:hidden; margin-bottom:0.2rem; }
+  .prog-bar-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#3b82f6,#1d4ed8); transition:width 0.4s; }
+  .prog-label { font-size:0.65rem; color:var(--text-muted); }
+
+  /* DIAS */
+  .dias-chip { font-size:0.72rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:7px; }
+  .dias-ok { background:var(--success-light); color:var(--success); }
+  .dias-warn { background:#fef3e2; color:var(--warning); }
+  .dias-danger { background:var(--danger-light); color:var(--danger); }
+
+  /* TEMAS */
+  .sec-title { font-family:'Montserrat',sans-serif; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin:1rem 0 0.5rem; padding-bottom:0.3rem; border-bottom:1px solid var(--border); }
+  .tema-item { background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:0.4rem; overflow:hidden; }
+  .tema-main { display:flex; align-items:center; gap:0.5rem; padding:0.55rem 0.75rem; cursor:pointer; }
+  .tema-num { font-family:'Montserrat',sans-serif; font-size:0.72rem; font-weight:700; color:var(--text-muted); width:18px; flex-shrink:0; }
+  .tema-nombre { flex:1; font-size:0.82rem; font-weight:500; }
+  .estado-sel { font-family:'DM Sans',sans-serif; font-size:0.62rem; border:1px solid var(--border); border-radius:5px; padding:0.1rem 0.3rem; background:var(--surface2); outline:none; cursor:pointer; }
+  .estado-sel.leido { background:#fef9c3; color:#92400e; border-color:#fbbf24; }
+  .estado-sel.estudiado { background:#dbeeff; color:#1d4ed8; border-color:#93c5fd; }
+  .estado-sel.aprendido { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
+  .dias-inp { width:40px; border:1px solid var(--border); border-radius:5px; padding:0.1rem 0.3rem; font-size:0.68rem; text-align:center; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; }
+  .dias-inp:focus { border-color:#93c5fd; }
+  .tema-chev { font-size:0.58rem; color:var(--text-muted); transition:transform 0.18s; flex-shrink:0; }
+  .tema-chev.open { transform:rotate(180deg); }
+  .btn-del-t { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.72rem; padding:0 0.1rem; }
+
+  /* SUBTEMAS */
+  .subtemas-panel { display:none; background:var(--surface2); border-top:1px solid var(--border); padding:0.5rem 0.75rem 0.5rem 2rem; }
+  .subtemas-panel.open { display:block; }
+  .subtema-item { display:flex; align-items:center; gap:0.4rem; padding:0.28rem 0; border-bottom:1px solid var(--border); font-size:0.75rem; }
+  .subtema-item:last-child { border-bottom:none; }
+  .subtema-dot { width:5px; height:5px; border-radius:50%; background:var(--text-muted); flex-shrink:0; }
+  .subtema-nombre { flex:1; }
+  .sub-estado-sel { font-family:'DM Sans',sans-serif; font-size:0.58rem; border:1px solid var(--border); border-radius:5px; padding:0.08rem 0.25rem; background:var(--surface2); outline:none; cursor:pointer; }
+  .sub-estado-sel.leido { background:#fef9c3; color:#92400e; border-color:#fbbf24; }
+  .sub-estado-sel.estudiado { background:#dbeeff; color:#1d4ed8; border-color:#93c5fd; }
+  .sub-estado-sel.aprendido { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
+  .sub-dias-inp { width:36px; border:1px solid var(--border); border-radius:5px; padding:0.08rem 0.25rem; font-size:0.62rem; text-align:center; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; }
+  .add-sub-row { display:flex; gap:0.28rem; margin-top:0.38rem; }
+  .add-sub-inp { flex:1; border:1px solid var(--border); border-radius:5px; padding:0.22rem 0.4rem; font-size:0.71rem; font-family:'DM Sans',sans-serif; background:white; outline:none; }
+  .btn-add-sub { background:white; border:1px solid var(--border); border-radius:5px; padding:0.22rem 0.45rem; font-size:0.72rem; cursor:pointer; color:var(--text-muted); }
+
+  /* ADD TEMA */
+  .add-row { display:flex; gap:0.4rem; margin-top:0.5rem; }
+  .add-inp { flex:1; border:1px solid var(--border); border-radius:7px; padding:0.4rem 0.65rem; font-size:0.78rem; font-family:'DM Sans',sans-serif; background:var(--surface); outline:none; }
+  .add-inp:focus { border-color:#93c5fd; }
+  .btn-add { background:var(--text); color:white; border:none; border-radius:7px; padding:0.4rem 0.9rem; font-size:0.78rem; font-family:'DM Sans',sans-serif; cursor:pointer; }
+
+  /* PANEL DERECHO - PRÁCTICA */
+  .practica-title { font-family:'Montserrat',sans-serif; font-size:1rem; font-weight:700; margin-bottom:0.25rem; }
+  .practica-sub { font-size:0.75rem; color:var(--text-muted); line-height:1.5; margin-bottom:1rem; }
+  .instrucciones { background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:1rem; margin-bottom:1rem; }
+  .inst-title { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.4rem; }
+  ol.pasos { font-size:0.75rem; color:var(--text-muted); line-height:1.8; padding-left:1.1rem; }
+  .btn-copiar { width:100%; padding:0.45rem; border-radius:7px; border:1px dashed var(--border); background:white; font-family:'DM Sans',sans-serif; font-size:0.75rem; cursor:pointer; color:var(--text-muted); margin-top:0.6rem; }
+  .btn-copiar:hover { border-color:var(--text-muted); }
+  .json-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.35rem; }
+  .json-area { width:100%; border:1px solid var(--border); border-radius:8px; padding:0.65rem 0.8rem; font-size:0.75rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; resize:vertical; color:var(--text); line-height:1.5; }
+  .btn-practicar { width:100%; padding:0.55rem; border-radius:8px; border:none; background:var(--text); color:white; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; margin-bottom:0.4rem; }
+  .btn-limpiar { width:100%; padding:0.45rem; border-radius:8px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.75rem; cursor:pointer; color:var(--text-muted); }
+  .preview-ok { background:var(--success-light); border:1px solid #6ee7b7; border-radius:8px; padding:0.65rem 0.9rem; margin-top:0.5rem; font-size:0.75rem; color:var(--success); font-weight:600; }
+
+  /* MODAL REPASO */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.32); z-index:1000; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--surface); border-radius:14px; padding:1.4rem; width:540px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,0.15); max-height:85vh; overflow-y:auto; }
+  .modal h3 { font-family:'Montserrat',sans-serif; font-size:1rem; font-weight:700; margin-bottom:1rem; }
+  .repaso-nav { display:flex; align-items:center; justify-content:space-between; margin-top:1rem; padding-top:0.75rem; border-top:1px solid var(--border); }
+  .repaso-nav button { padding:0.4rem 0.9rem; border:1px solid var(--border); border-radius:7px; background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.8rem; cursor:pointer; }
+  .repaso-counter { font-size:0.72rem; color:var(--text-muted); }
+  .ia-loading { text-align:center; padding:2rem; color:var(--text-muted); font-size:0.85rem; }
+
+  .pregunta-card { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:1.1rem; }
+  .pregunta-txt { font-size:0.9rem; font-weight:600; margin-bottom:0.9rem; line-height:1.4; }
+  .opciones { display:flex; flex-direction:column; gap:0.4rem; }
+  .opcion-btn { text-align:left; padding:0.5rem 0.8rem; border:1px solid var(--border); border-radius:7px; background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.8rem; cursor:pointer; transition:all 0.12s; }
+  .opcion-btn:hover { background:var(--surface2); }
+  .opcion-btn.correcta { background:var(--success-light); border-color:#6ee7b7; color:var(--success); }
+  .opcion-btn.incorrecta { background:var(--danger-light); border-color:#fca5a5; color:var(--danger); }
+  .explicacion { margin-top:0.6rem; font-size:0.76rem; color:var(--text-muted); background:var(--surface); border-radius:6px; padding:0.5rem 0.7rem; border:1px solid var(--border); }
+  .tarjeta-resp { display:none; margin-top:0.6rem; background:var(--surface); border:1px solid #6ee7b7; border-radius:7px; padding:0.6rem 0.8rem; font-size:0.82rem; color:var(--success); }
+  .btn-ver-resp { margin-top:0.6rem; padding:0.35rem 0.8rem; border:1px solid var(--border); border-radius:6px; background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.75rem; cursor:pointer; }
+
+  @media(max-width:900px) { .split { grid-template-columns:1fr; } .panel { height:auto; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Ne<span>xu</span></div>
+  <nav><a href="portada.html">← Inicio</a></nav>
+</header>
+
+<div class="split">
+  <div class="panel panel-left" id="panel-izq"></div>
+  <div class="panel panel-right" id="panel-der"></div>
+</div>
+
+<!-- MODAL REPASO -->
+<div class="modal-overlay" id="modal-repaso">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 id="repaso-titulo">🧠 Repaso</h3>
+      <button onclick="cerrarRepaso()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.25rem 0.6rem;font-size:0.75rem;cursor:pointer">← Volver</button>
+    </div>
+    <div id="repaso-contenido"></div>
+    <div class="repaso-nav">
+      <button onclick="pregAnterior()">← Anterior</button>
+      <span class="repaso-counter" id="repaso-counter"></span>
+      <button onclick="pregSiguiente()">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── PARAMS ──
+const params = new URLSearchParams(location.search);
+const finalId = params.get('id') || '';
+
+// ── MATERIAS DEL PLAN ──
+const TODAS_MATERIAS_PLAN = [
+  {id:'med-01',nombre:'Articulación Básico Clínico Com. I',carrera:'Medicina'},
+  {id:'med-02',nombre:'Conc. y Formación del Ser Humano I',carrera:'Medicina'},
+  {id:'med-03',nombre:'Contexto Social Proceso Salud-Enf.',carrera:'Medicina'},
+  {id:'med-04',nombre:'Conc. y Formación del Ser Humano II',carrera:'Medicina'},
+  {id:'med-05',nombre:'Hábitat, Ecología y Salud',carrera:'Medicina'},
+  {id:'med-06',nombre:'Interculturalidad y Salud',carrera:'Medicina'},
+  {id:'med-07',nombre:'Nacimiento, Crecimiento y Desarrollo',carrera:'Medicina'},
+  {id:'med-08',nombre:'Articulación Básico Clínico Com. II',carrera:'Medicina'},
+  {id:'med-09',nombre:'Agentes, Mecanismos y Nutrición',carrera:'Medicina'},
+  {id:'med-10',nombre:'Metodología Inv. Cs. de la Salud',carrera:'Medicina'},
+  {id:'med-11',nombre:'Computación I',carrera:'Medicina'},
+  {id:'med-12',nombre:'Redes, Programas y Sistemas Salud',carrera:'Medicina'},
+  {id:'med-13',nombre:'Computación II',carrera:'Medicina'},
+  {id:'med-14',nombre:'Articulación Básico Clínico Com. III',carrera:'Medicina'},
+  {id:'med-15',nombre:'Epidemiología Clínica y Diagnóstico',carrera:'Medicina'},
+  {id:'med-16',nombre:'Salud Mental',carrera:'Medicina'},
+  {id:'med-17',nombre:'Salud Colectiva y Comunitaria',carrera:'Medicina'},
+  {id:'med-18',nombre:'Inglés para Cs. de la Salud',carrera:'Medicina'},
+  {id:'med-19',nombre:'Electiva I (Idioma I)',carrera:'Medicina'},
+  {id:'med-20',nombre:'Farmacología General',carrera:'Medicina'},
+  {id:'med-21',nombre:'Investigación en Salud',carrera:'Medicina'},
+  {id:'med-22',nombre:'Salud Integral de la Mujer',carrera:'Medicina'},
+  {id:'med-23',nombre:'Medicina Interna y Campos Clín. I',carrera:'Medicina'},
+  {id:'med-24',nombre:'Farmacología Terapéutica',carrera:'Medicina'},
+  {id:'med-25',nombre:'Salud de la Niñez y Adolescencia',carrera:'Medicina'},
+  {id:'med-26',nombre:'Medicina General I',carrera:'Medicina'},
+  {id:'med-27',nombre:'Seguridad del Paciente',carrera:'Medicina'},
+  {id:'med-28',nombre:'Consumos Problemáticos',carrera:'Medicina'},
+  {id:'med-29',nombre:'Medicina Interna y Campos Clín. II',carrera:'Medicina'},
+  {id:'med-30',nombre:'Clínica Quirúrgica y Emergentol.',carrera:'Medicina'},
+  {id:'med-31',nombre:'Medicina Legal y Toxicología',carrera:'Medicina'},
+  {id:'med-32',nombre:'Medicina General II',carrera:'Medicina'},
+  {id:'med-33',nombre:'Electiva II (Idioma II)',carrera:'Medicina'},
+  {id:'med-34',nombre:'Bioética y Derechos Humanos',carrera:'Medicina'},
+  {id:'med-35',nombre:'Salud del Adulto Mayor',carrera:'Medicina'},
+  {id:'med-36',nombre:'Cuidados Paliativos',carrera:'Medicina'},
+  {id:'med-37',nombre:'Diagnóstico por Imagen',carrera:'Medicina'},
+  {id:'nut-01',nombre:'Matemática',carrera:'Nutrición'},
+  {id:'nut-02',nombre:'Biología',carrera:'Nutrición'},
+  {id:'nut-03',nombre:'Química Básica',carrera:'Nutrición'},
+  {id:'nut-04',nombre:'Informática',carrera:'Nutrición'},
+  {id:'nut-05',nombre:'Física',carrera:'Nutrición'},
+  {id:'nut-06',nombre:'Anatomía y Fisiología',carrera:'Nutrición'},
+  {id:'nut-07',nombre:'Química Biológica',carrera:'Nutrición'},
+  {id:'nut-08',nombre:'Sociología y Antropología',carrera:'Nutrición'},
+  {id:'nut-09',nombre:'Técnica Dietética',carrera:'Nutrición'},
+  {id:'nut-10',nombre:'Nutrición Humana',carrera:'Nutrición'},
+  {id:'nut-11',nombre:'Bromatología',carrera:'Nutrición'},
+  {id:'nut-12',nombre:'Metodología de la Investigación',carrera:'Nutrición'},
+  {id:'nut-13',nombre:'Inglés',carrera:'Nutrición'},
+  {id:'nut-14',nombre:'Microbiología y Parasitología',carrera:'Nutrición'},
+  {id:'nut-15',nombre:'Estadística',carrera:'Nutrición'},
+  {id:'nut-16',nombre:'Técnica Dietoterápica',carrera:'Nutrición'},
+  {id:'nut-17',nombre:'Nutrición Materno Infantil',carrera:'Nutrición'},
+  {id:'nut-18',nombre:'Fisiopatología',carrera:'Nutrición'},
+  {id:'nut-19',nombre:'Epidemiología Nutricional',carrera:'Nutrición'},
+  {id:'nut-20',nombre:'Educación Aliment. y Nutricional',carrera:'Nutrición'},
+  {id:'nut-21',nombre:'Dietoterapia del Adulto',carrera:'Nutrición'},
+  {id:'nut-22',nombre:'Economía Alimentaria',carrera:'Nutrición'},
+  {id:'nut-23',nombre:'Dietoterapia del Niño',carrera:'Nutrición'},
+  {id:'nut-24',nombre:'Evaluación Nutricional',carrera:'Nutrición'},
+  {id:'nut-25',nombre:'Nutrición en Salud Pública',carrera:'Nutrición'},
+  {id:'nut-26',nombre:'Psicología',carrera:'Nutrición'},
+  {id:'nut-27',nombre:'Comunicación Social',carrera:'Nutrición'},
+  {id:'nut-28',nombre:'Farmacología y Nutrición',carrera:'Nutrición'},
+  {id:'nut-29',nombre:'Ética',carrera:'Nutrición'},
+  {id:'nut-30',nombre:'Gestión Servicios de Alimentación',carrera:'Nutrición'},
+  {id:'nut-31',nombre:'Electiva I',carrera:'Nutrición'},
+  {id:'nut-32',nombre:'Políticas Aliment. y Nutricionales',carrera:'Nutrición'},
+  {id:'nut-33',nombre:'Tecnología Alimentaria',carrera:'Nutrición'},
+  {id:'nut-34',nombre:'Electiva II',carrera:'Nutrición'},
+  {id:'nut-pp',nombre:'Prácticas Profesionales',carrera:'Nutrición'},
+  {id:'nut-ts',nombre:'Tesina',carrera:'Nutrición'},
+];
+
+// ── STORAGE ──
+function ls(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}}
+function lsSet(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function getUnidades(){return ls('final_unidades_'+finalId)||[];}
+function setUnidades(l){lsSet('final_unidades_'+finalId,l);}
+function getFinales(){return ls('finales')||[];}
+function getJsonRepaso(){return localStorage.getItem('final_repaso_json_'+finalId)||'';}
+function setJsonRepaso(v){localStorage.setItem('final_repaso_json_'+finalId,v);}
+
+function diasRestantes(fecha){
+  if(!fecha)return null;
+  const[d,m,y]=fecha.split('/');
+  const diff=new Date(y,m-1,d)-new Date();
+  return Math.ceil(diff/(1000*60*60*24));
+}
+
+// ── INIT ──
+if(!finalId){ window.location.href='portada.html'; }
+
+const materia = TODAS_MATERIAS_PLAN.find(m=>m.id===finalId);
+const finalData = getFinales().find(f=>f.planId===finalId);
+
+if(!materia){ document.getElementById('panel-izq').innerHTML='<div style="padding:2rem;color:#c1440e">Final no encontrado. <a href="portada.html">Volver</a></div>'; }
+else { renderPanelIzq(); renderPanelDer(); }
+
+// ── PANEL IZQUIERDO ──
+function renderPanelIzq(){
+  const temas = getUnidades();
+  const total = temas.length;
+  const aprendidas = temas.filter(u=>u.estado==='aprendido').length;
+  const pct = total>0 ? Math.round(aprendidas/total*100) : 0;
+  const dias = finalData?.fecha ? diasRestantes(finalData.fecha) : null;
+  const chipCls = materia.carrera==='Medicina'?'med':'nut';
+
+  const diasChip = dias===null?''
+    : dias<0?`<span class="dias-chip dias-danger">Venció</span>`
+    : dias<=7?`<span class="dias-chip dias-danger">${dias}d</span>`
+    : dias<=20?`<span class="dias-chip dias-warn">${dias}d</span>`
+    : `<span class="dias-chip dias-ok">${dias}d</span>`;
+
+  const items = temas.map((t,i)=>{
+    const esCls = {leido:'leido',estudiado:'estudiado',aprendido:'aprendido'}[t.estado]||'';
+    const marcado = t.marcado===true;
+    const subs = t.subtemas||[];
+    const subItems = subs.map((s,j)=>{
+      const sub = typeof s==='object' ? s : {nombre:s,estado:'sin-empezar',dias:'',marcado:false};
+      const sCls = {leido:'leido',estudiado:'estudiado',aprendido:'aprendido'}[sub.estado]||'';
+      const subMarcado = sub.marcado===true;
+      return `
+      <div class="subtema-item">
+        <div onclick="toggleCheckSub(${i},${j});event.stopPropagation()" style="width:13px;height:13px;border-radius:3px;border:2px solid ${subMarcado?'var(--success)':'var(--border)'};background:${subMarcado?'var(--success)':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:0.5rem;color:white">${subMarcado?'✓':''}</div>
+        <span class="subtema-nombre" style="${subMarcado?'text-decoration:line-through;color:var(--text-muted)':''}">${sub.nombre}</span>
+        <select class="sub-estado-sel ${sCls}" onchange="setSubEstado(${i},${j},this)" onclick="event.stopPropagation()">
+          <option value="sin-empezar" ${sub.estado==='sin-empezar'?'selected':''}>Sin empezar</option>
+          <option value="leido" ${sub.estado==='leido'?'selected':''}>Leído</option>
+          <option value="estudiado" ${sub.estado==='estudiado'?'selected':''}>Estudiado</option>
+          <option value="aprendido" ${sub.estado==='aprendido'?'selected':''}>Aprendido</option>
+        </select>
+        <input type="number" class="sub-dias-inp" value="${sub.dias||''}" min="0" max="30" placeholder="d"
+          title="Días" onclick="event.stopPropagation()" onchange="setSubDias(${i},${j},this.value)">
+        <button class="btn-del-t" onclick="borrarSubtema(${i},${j});event.stopPropagation()">×</button>
+      </div>`;
+    }).join('');
+    return `
+      <div class="tema-item" id="tema-${i}">
+        <div class="tema-main" onclick="toggleSubtemas(${i})">
+          <div onclick="event.stopPropagation();toggleCheckTema(${i})" style="width:14px;height:14px;border-radius:3px;border:2px solid ${marcado?'var(--success)':'var(--border)'};background:${marcado?'var(--success)':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:0.55rem;color:white">${marcado?'✓':''}</div>
+          <span class="tema-num">${i+1}</span>
+          <span class="tema-nombre" style="${marcado?'text-decoration:line-through;color:var(--text-muted)':''}">${t.nombre}</span>
+          <select class="estado-sel ${esCls}" onchange="setEstado(${i},this)" onclick="event.stopPropagation()">
+            <option value="sin-empezar" ${t.estado==='sin-empezar'?'selected':''}>Sin empezar</option>
+            <option value="leido" ${t.estado==='leido'?'selected':''}>Leído</option>
+            <option value="estudiado" ${t.estado==='estudiado'?'selected':''}>Estudiado</option>
+            <option value="aprendido" ${t.estado==='aprendido'?'selected':''}>Aprendido</option>
+          </select>
+          <input type="number" class="dias-inp" value="${t.dias||''}" min="0" max="30" placeholder="días"
+            title="Días a dedicar" onclick="event.stopPropagation()"
+            onchange="setDias(${i},this.value)">
+          <button class="btn-del-t" onclick="borrarTema(${i});event.stopPropagation()">×</button>
+          <span class="tema-chev" id="chev-${i}">▼</span>
+        </div>
+        <div class="subtemas-panel" id="subs-${i}">
+          ${subItems}
+          <div class="add-sub-row">
+            <input class="add-sub-inp" id="sub-inp-${i}" placeholder="Agregar subtema..." onkeydown="if(event.key==='Enter'){agregarSubtema(${i});event.stopPropagation()}">
+            <button class="btn-add-sub" onclick="agregarSubtema(${i})">+</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('panel-izq').innerHTML = `
+    <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.9rem">
+      <a href="portada.html" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none">← Inicio</a>
+      <span class="chip ${chipCls}">${materia.carrera}</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:800">${materia.nombre}</span>
+    </div>
+    <div class="meta-chips">
+      ${finalData?.modalidad?`<span class="chip">${finalData.modalidad==='regular-m'?'Regular':finalData.modalidad==='libre'?'Libre':'Reválida'}</span>`:''}
+      ${finalData?.fecha?`<span class="chip">📅 ${finalData.fecha}</span>`:''}
+      ${diasChip}
+    </div>
+    <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
+    <div class="prog-label" style="margin-bottom:0.75rem">${aprendidas}/${total} temas aprendidos · ${pct}%</div>
+
+    <div class="sec-title">Temas del programa</div>
+    ${items||'<div style="font-size:0.78rem;color:var(--text-muted);padding:0.5rem 0">Sin temas. Agregá los del programa abajo.</div>'}
+
+    <div class="add-row" style="margin-top:0.75rem">
+      <input class="add-inp" id="inp-tema" placeholder="Agregar tema..." onkeydown="if(event.key==='Enter')agregarTema()">
+      <button class="btn-add" onclick="agregarTema()">+ Tema</button>
+    </div>
+  `;
+}
+
+function toggleCheckTema(i){
+  const l=getUnidades();
+  l[i].marcado = !l[i].marcado;
+  setUnidades(l);
+  renderPanelIzq();
+}
+
+function toggleCheckSub(i,j){
+  const l=getUnidades();
+  if(typeof l[i].subtemas[j]==='string') l[i].subtemas[j]={nombre:l[i].subtemas[j],estado:'sin-empezar',dias:'',marcado:false};
+  l[i].subtemas[j].marcado = !l[i].subtemas[j].marcado;
+  setUnidades(l);
+  renderPanelIzq();
+  setTimeout(()=>{document.getElementById('subs-'+i)?.classList.add('open');document.getElementById('chev-'+i)?.classList.add('open');},10);
+}
+
+function toggleSubtemas(i){
+  const panel=document.getElementById('subs-'+i);
+  const chev=document.getElementById('chev-'+i);
+  panel?.classList.toggle('open');
+  chev?.classList.toggle('open');
+}
+
+function agregarTema(){
+  const inp=document.getElementById('inp-tema');
+  const txt=inp?.value.trim(); if(!txt)return;
+  const l=getUnidades(); l.push({nombre:txt,estado:'sin-empezar',dias:'',subtemas:[]}); setUnidades(l);
+  inp.value=''; renderPanelIzq();
+}
+
+function borrarTema(i){
+  const l=getUnidades(); l.splice(i,1); setUnidades(l); renderPanelIzq();
+}
+
+function setEstado(i,sel){
+  const l=getUnidades(); l[i].estado=sel.value; setUnidades(l);
+  const cls={leido:'leido',estudiado:'estudiado',aprendido:'aprendido'}[sel.value]||'';
+  sel.className='estado-sel '+cls;
+  const aprendidas=l.filter(u=>u.estado==='aprendido').length;
+  const pct=l.length>0?Math.round(aprendidas/l.length*100):0;
+  const fill=document.querySelector('.prog-bar-fill');
+  const lbl=document.querySelector('.prog-label');
+  if(fill)fill.style.width=pct+'%';
+  if(lbl)lbl.textContent=`${aprendidas}/${l.length} temas aprendidos · ${pct}%`;
+}
+
+function setDias(i,val){
+  const l=getUnidades(); l[i].dias=val; setUnidades(l);
+}
+
+function agregarSubtema(i){
+  const inp=document.getElementById('sub-inp-'+i);
+  const txt=inp?.value.trim(); if(!txt)return;
+  const l=getUnidades(); if(!l[i].subtemas)l[i].subtemas=[];
+  l[i].subtemas.push({nombre:txt,estado:'sin-empezar',dias:''}); setUnidades(l); inp.value='';
+  renderPanelIzq();
+  setTimeout(()=>{document.getElementById('subs-'+i)?.classList.add('open');document.getElementById('chev-'+i)?.classList.add('open');},10);
+}
+
+function borrarSubtema(i,j){
+  const l=getUnidades(); l[i].subtemas.splice(j,1); setUnidades(l);
+  renderPanelIzq();
+  setTimeout(()=>{document.getElementById('subs-'+i)?.classList.add('open');document.getElementById('chev-'+i)?.classList.add('open');},10);
+}
+
+function setSubEstado(i,j,sel){
+  const l=getUnidades();
+  if(typeof l[i].subtemas[j]==='string') l[i].subtemas[j]={nombre:l[i].subtemas[j],estado:'sin-empezar',dias:''};
+  l[i].subtemas[j].estado=sel.value; setUnidades(l);
+  const cls={leido:'leido',estudiado:'estudiado',aprendido:'aprendido'}[sel.value]||'';
+  sel.className='sub-estado-sel '+cls;
+}
+
+function setSubDias(i,j,val){
+  const l=getUnidades();
+  if(typeof l[i].subtemas[j]==='string') l[i].subtemas[j]={nombre:l[i].subtemas[j],estado:'sin-empezar',dias:''};
+  l[i].subtemas[j].dias=val; setUnidades(l);
+}
+
+// ── PANEL DERECHO ──
+function renderPanelDer(){
+  const saved = getJsonRepaso();
+  document.getElementById('panel-der').innerHTML = `
+    <div class="practica-title">🧠 Práctica</div>
+    <div class="practica-sub">Usá NotebookLM para generar preguntas desde el programa de ${materia.nombre} y pegá el JSON acá para practicar.</div>
+
+    <div class="instrucciones">
+      <div class="inst-title">Cómo generar preguntas</div>
+      <ol class="pasos">
+        <li>Abrí <strong>notebook.google.com</strong></li>
+        <li>Subí el programa o tus apuntes de ${materia.nombre}</li>
+        <li>Copiá el prompt con el botón de abajo y pegalo en NotebookLM</li>
+        <li>Copiá el JSON que te devuelve y pegalo abajo</li>
+        <li>Tocá <strong>Cargar y practicar</strong></li>
+      </ol>
+      <button class="btn-copiar" onclick="copiarPrompt()">📋 Copiar prompt para NotebookLM</button>
+    </div>
+
+    <div class="json-label">Pegá el JSON de preguntas acá</div>
+    <textarea class="json-area" id="json-area" rows="8" placeholder='[
+  {"tipo":"vf","pregunta":"...","respuesta":true,"explicacion":"..."},
+  {"tipo":"mc","pregunta":"...","opciones":["a","b","c","d"],"correcta":0,"explicacion":"..."},
+  {"tipo":"tarjeta","pregunta":"...","respuesta":"..."}
+]'>${saved}</textarea>
+
+    <div style="display:flex;gap:0.5rem;margin-top:0.6rem;margin-bottom:0.5rem">
+      <button class="btn-practicar" onclick="cargarYPracticar()">🧠 Cargar y practicar</button>
+      <button class="btn-limpiar" onclick="limpiarJson()">Limpiar</button>
+    </div>
+    <div id="preview-json"></div>
+  `;
+}
+
+function copiarPrompt(){
+  const txt = `Basándote en los documentos cargados de la materia "${materia.nombre}", generá 10 preguntas de práctica mezclando estos tipos:
+- Verdadero/Falso
+- Multiple choice (4 opciones)
+- Tarjetas pregunta-respuesta
+
+Respondé ÚNICAMENTE con un JSON array válido, sin texto adicional ni markdown. Usá exactamente este formato:
+
+[
+  {"tipo":"vf","pregunta":"Afirmación concreta...","respuesta":true,"explicacion":"Explicación breve"},
+  {"tipo":"mc","pregunta":"¿Pregunta?","opciones":["Opción A","Opción B","Opción C","Opción D"],"correcta":0,"explicacion":"Explicación breve"},
+  {"tipo":"tarjeta","pregunta":"¿Concepto clave?","respuesta":"Definición completa"}
+]`;
+  navigator.clipboard.writeText(txt).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  alert('✅ Prompt copiado. Pegalo en NotebookLM.');
+}
+
+function cargarYPracticar(){
+  const raw = document.getElementById('json-area')?.value.trim();
+  if(!raw){alert('Pegá el JSON primero');return;}
+  try{
+    const clean=raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    preguntasRepaso=JSON.parse(clean);
+    if(!Array.isArray(preguntasRepaso)||!preguntasRepaso.length)throw new Error();
+  }catch{alert('JSON inválido. Copialo directamente desde NotebookLM.');return;}
+  setJsonRepaso(raw);
+  const prev=document.getElementById('preview-json');
+  if(prev) prev.innerHTML=`<div class="preview-ok">✓ ${preguntasRepaso.length} preguntas cargadas · ${preguntasRepaso.filter(p=>p.tipo==='mc').length} MC · ${preguntasRepaso.filter(p=>p.tipo==='vf').length} V/F · ${preguntasRepaso.filter(p=>p.tipo==='tarjeta').length} tarjetas</div>`;
+  idxRepaso=0;
+  document.getElementById('repaso-titulo').textContent='🧠 Práctica · '+materia.nombre;
+  document.getElementById('modal-repaso').classList.add('open');
+  mostrarPregunta();
+}
+
+function limpiarJson(){
+  const ta=document.getElementById('json-area');if(ta)ta.value='';
+  setJsonRepaso('');
+  const prev=document.getElementById('preview-json');if(prev)prev.innerHTML='';
+}
+
+// ── REPASO ──
+let preguntasRepaso=[], idxRepaso=0;
+
+function mostrarPregunta(){
+  const contenido=document.getElementById('repaso-contenido');
+  const counter=document.getElementById('repaso-counter');
+  if(!preguntasRepaso.length){contenido.innerHTML='<div class="ia-loading">Sin preguntas</div>';return;}
+  counter.textContent=`${idxRepaso+1} / ${preguntasRepaso.length}`;
+  const p=preguntasRepaso[idxRepaso];
+  if(p.tipo==='mc') contenido.innerHTML=buildMC(p);
+  else if(p.tipo==='vf') contenido.innerHTML=buildVF(p);
+  else contenido.innerHTML=buildTarjeta(p);
+}
+
+function buildMC(p){
+  return `<div class="pregunta-card">
+    <div class="pregunta-txt">${p.pregunta}</div>
+    <div class="opciones">
+      ${p.opciones.map((op,i)=>`<button class="opcion-btn" onclick="responderMC(${i},${p.correcta},this)">${op}</button>`).join('')}
+    </div>
+    <div class="explicacion" id="explic" style="display:none">${p.explicacion||''}</div>
+  </div>`;
+}
+function responderMC(idx,correcta,btn){
+  document.querySelectorAll('.opcion-btn').forEach((b,i)=>{b.disabled=true;if(i===correcta)b.classList.add('correcta');else if(i===idx)b.classList.add('incorrecta');});
+  const ex=document.getElementById('explic');if(ex&&p?.explicacion)ex.style.display='block';
+}
+
+function buildVF(p){
+  return `<div class="pregunta-card">
+    <div class="pregunta-txt">${p.pregunta}</div>
+    <div class="opciones">
+      <button class="opcion-btn" onclick="responderVF(true,${p.respuesta},this)">✓ Verdadero</button>
+      <button class="opcion-btn" onclick="responderVF(false,${p.respuesta},this)">✗ Falso</button>
+    </div>
+    <div class="explicacion" id="explic-vf" style="display:none">${p.explicacion||''}</div>
+  </div>`;
+}
+function responderVF(resp,correcta,btn){
+  document.querySelectorAll('.opcion-btn').forEach(b=>b.disabled=true);
+  btn.classList.add(resp===correcta?'correcta':'incorrecta');
+  const other=document.querySelectorAll('.opcion-btn')[resp?1:0];
+  if(resp!==correcta)other.classList.add('correcta');
+  const ex=document.getElementById('explic-vf');if(ex)ex.style.display='block';
+}
+
+function buildTarjeta(p){
+  return `<div class="pregunta-card">
+    <div class="pregunta-txt">${p.pregunta}</div>
+    <button class="btn-ver-resp" onclick="document.getElementById('tarj-resp').style.display='block';this.style.display='none'">Ver respuesta</button>
+    <div class="tarjeta-resp" id="tarj-resp">${p.respuesta}</div>
+  </div>`;
+}
+
+function pregAnterior(){if(idxRepaso>0){idxRepaso--;mostrarPregunta();}}
+function pregSiguiente(){if(idxRepaso<preguntasRepaso.length-1){idxRepaso++;mostrarPregunta();}}
+function cerrarRepaso(){document.getElementById('modal-repaso').classList.remove('open');}
+document.getElementById('modal-repaso').addEventListener('click',e=>{if(e.target===document.getElementById('modal-repaso'))cerrarRepaso();});
+</script>
+</body>
+</html>
