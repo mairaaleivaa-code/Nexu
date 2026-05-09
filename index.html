@@ -221,7 +221,38 @@
   .btn-add-nota:hover { background:var(--surface2); }
 
   @media(max-width:1024px) { .materias-grid { grid-template-columns:repeat(2,1fr); } }
-  @media(max-width:600px) { .materias-grid { grid-template-columns:1fr; } nav { display:none; } main { padding:1rem 0.85rem; } }
+  @media(max-width:600px) {
+    .materias-grid { grid-template-columns:1fr; }
+    main { padding:0.85rem; }
+
+    /* HEADER */
+    header { padding:0 0.85rem; height:auto; min-height:48px; flex-wrap:wrap; gap:0.3rem; padding-top:0.4rem; padding-bottom:0.4rem; }
+    .logo { font-size:1rem; }
+    .date-chip { font-size:0.62rem; padding:0.2rem 0.5rem; }
+    header > div { gap:0.3rem; flex-wrap:wrap; justify-content:flex-end; }
+    header > div button { font-size:0.62rem; padding:0.2rem 0.45rem; }
+
+    /* SALUDO */
+    .page-title { font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .page-subtitle { font-size:0.72rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* NAV — mostrar como pills horizontales */
+    nav { display:flex !important; gap:0.2rem; }
+    nav a { font-size:0.72rem; padding:0.28rem 0.55rem; }
+
+    /* MESAS — scroll horizontal en una sola línea */
+    #mesas-chips { flex-wrap:nowrap !important; overflow-x:auto; padding-bottom:0.3rem; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    #mesas-chips::-webkit-scrollbar { display:none; }
+    .mesa-chip { flex-shrink:0; font-size:0.62rem; padding:0.22rem 0.5rem; }
+
+    /* FINALES — tarjeta vertical */
+    .final-row { grid-template-columns:1fr !important; gap:0.5rem; padding:0.75rem; border:1px solid var(--border); border-radius:10px; margin-bottom:0.5rem; background:var(--surface); }
+    .finales-section .final-row + .final-row { border-top:none; }
+    #finales-container { padding:0.5rem; }
+    .finales-header { flex-wrap:wrap; gap:0.4rem; }
+    .finales-header > div:last-child { width:100%; display:flex; gap:0.4rem; }
+    .finales-header > div:last-child button { flex:1; font-size:0.7rem; }
+  }
 </style>
 </head>
 <body>

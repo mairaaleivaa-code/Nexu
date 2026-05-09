@@ -139,7 +139,16 @@
   .btn-cancel { padding:0.45rem 1rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.8rem; cursor:pointer; color:var(--text-muted); }
   .btn-save { padding:0.45rem 1rem; border-radius:7px; border:none; background:var(--text); color:white; font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:500; cursor:pointer; }
 
-  @media(max-width:900px) { .plan-grid { grid-template-columns:1fr; } nav { display:none; } }
+  @media(max-width:900px) {
+    .plan-grid { grid-template-columns:1fr; }
+    nav { display:flex !important; }
+    nav a { font-size:0.72rem; padding:0.28rem 0.55rem; }
+    header { padding:0 0.85rem; height:auto; min-height:48px; }
+    main { padding:0.85rem; }
+    .materia-main { flex-wrap:wrap; }
+    .nota-input { width:42px; }
+    .fecha-input { width:100px; }
+  }
 </style>
 </head>
 <body>

@@ -315,8 +315,11 @@
   @media(max-width:900px) {
     .view-materia { padding:0.75rem; }
     .view-materia .split-layout { grid-template-columns:1fr; border-radius:8px; }
-    .view-materia .panel-left, .view-materia .panel-right { height:auto; }
-    nav { display:none; }
+    .view-materia .panel-left { height:auto; border-right:none; border-bottom:1px solid var(--border); }
+    .view-materia .panel-right { height:auto; }
+    nav { display:flex !important; }
+    nav a { font-size:0.72rem; padding:0.28rem 0.55rem; }
+    header { padding:0 0.85rem; }
   }
 </style>
 </head>
