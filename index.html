@@ -258,16 +258,20 @@
 <body>
 
 <header>
-  <div class="logo">Ne<span>xu</span></div>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <div class="logo">Ne<span>xu</span></div>
+    <div class="date-chip" id="fecha-hoy"></div>
+  </div>
   <nav>
     <a href="portada.html" class="active">Inicio</a>
     <a href="plan.html">Plan</a>
   </nav>
-  <div style="display:flex;align-items:center;gap:0.5rem">
-    <button onclick="exportarDatos()" style="font-size:0.7rem;font-weight:500;padding:0.28rem 0.7rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif" title="Exportar todos tus datos">⬇ Exportar</button>
-    <button onclick="document.getElementById('import-input').click()" style="font-size:0.7rem;font-weight:500;padding:0.28rem 0.7rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif" title="Importar datos desde backup">⬆ Importar</button>
-    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDatos(this)">
-    <div class="date-chip" id="fecha-hoy"></div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.25rem">
+    <div style="display:flex;gap:0.4rem">
+      <button onclick="exportarDatos()" style="font-size:0.7rem;font-weight:500;padding:0.28rem 0.7rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif" title="Exportar todos tus datos">⬇ Exportar</button>
+      <button onclick="document.getElementById('import-input').click()" style="font-size:0.7rem;font-weight:500;padding:0.28rem 0.7rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif" title="Importar datos desde backup">⬆ Importar</button>
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarDatos(this)">
+    </div>
   </div>
 </header>
 
