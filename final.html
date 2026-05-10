@@ -331,6 +331,24 @@ function renderPanelIzq(){
       </div>`;
   }).join('');
 
+  // Buscar programa desde data.js (si la materia existe en MATERIAS de cursada)
+  const PROGRAMAS_MAP = {
+    // Cursada actual
+    'salud-mental': 'programas/programa-medicina-saludmental.pdf',
+    'comunitaria': 'programas/programa-medicina-comunitaria.pdf',
+    'arti-iii': 'programas/programa-medicina-articiii.pdf',
+    'epidemio': 'programas/programa-medicina-epidemio.pdf',
+    'metodologia': 'programas/metodologia.pdf',
+    'matematicas': 'programas/programa-nutricion-matematicas.pdf',
+    'quimica-basica': 'programas/programa-nutricion-quimicabasica.pdf',
+    // Finales del plan
+    'med-17': 'programas/programa-salud-colectiva.pdf',
+    'nut-02': 'programas/programa-biologia.pdf',
+    'med-07': 'programas/programa-nacimiento.pdf',
+    'nut-06': 'programas/programa-anato.pdf',
+  };
+  const progUrl = PROGRAMAS_MAP[finalId] || '';
+
   document.getElementById('panel-izq').innerHTML = `
     <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.9rem">
       <a href="index.html" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none">← Inicio</a>
@@ -341,6 +359,7 @@ function renderPanelIzq(){
       ${finalData?.modalidad?`<span class="chip">${finalData.modalidad==='regular-m'?'Regular':finalData.modalidad==='libre'?'Libre':'Reválida'}</span>`:''}
       ${finalData?.fecha?`<span class="chip">📅 ${finalData.fecha}</span>`:''}
       ${diasChip}
+      ${progUrl?`<a href="${progUrl}" target="_blank" style="font-size:0.68rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);text-decoration:none">📋 Programa</a>`:''}
     </div>
     <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
     <div class="prog-label" style="margin-bottom:0.75rem">${aprendidas}/${total} temas aprendidos · ${pct}%</div>
