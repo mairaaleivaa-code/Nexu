@@ -17,7 +17,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "",
-    programa: "programas/programa-medicina-saludmental.pdf",
+    programa: "programas/programa-medicina-saludmental.pdf",  // ✅ nombre exacto del archivo
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -35,7 +35,10 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "07/05/2026",
-    programa: "programas/programa-medicina-comunitaria.pdf",
+    // ⚠️ No existe "programa-medicina-comunitaria.pdf" en tu repo.
+    // Hay "programa-salud-colectiva.pdf" — si es el mismo, usalo.
+    // Si tenés el PDF correcto, subilo a programas/ con ese nombre y descomentá la línea.
+    programa: "programas/programa-salud-colectiva.pdf",  // 👈 cambiá si subís el PDF correcto
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -54,7 +57,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "28/05/2026",
-    programa: "programas/programa-medicina-articiii.pdf",
+    programa: "programas/programa-medicina-articiii.pdf",  // ✅ nombre exacto del archivo
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -73,7 +76,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "promocional",
     examen: "",
-    programa: "",
+    programa: "",  // Sin programa por ahora
     campus: "",
     faltas: { actuales: 0, maximo: 2 },
     condiciones: [
@@ -92,7 +95,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "",
-    programa: "programas/programa-medicina-epidemio.pdf",
+    programa: "programas/programa-medicina-epidemio.pdf",  // ✅ nombre exacto del archivo
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -112,7 +115,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "promocional",
     examen: "04/05/2026",
-    programa: "programas/metodologia.pdf",
+    programa: "programas/metodologia.pdf",  // ✅ nombre exacto del archivo
     campus: "",
     faltas: { actuales: 3, maximo: 3 },
     condiciones: [
@@ -133,7 +136,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "promocional",
     examen: "",
-    programa: "programas/programa-nutricion-matematicas.pdf",
+    programa: "programas/programa-nutricion-matematicas.pdf",  // ✅ nombre exacto del archivo
     campus: "",
     faltas: { actuales: 1, maximo: 2 },
     condiciones: [
@@ -151,7 +154,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "08/05/2026",
-    programa: "programas/programa-nutricion-quimicabasica.pdf",
+    programa: "programas/programa-nutricion-quimicabasica.pdf",  // ✅ nombre exacto del archivo
     campus: "",
     faltas: { actuales: 1, maximo: 3 },
     condiciones: [
