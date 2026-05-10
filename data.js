@@ -17,7 +17,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "",
-    programa: "Materias/MEDICINA/CURSADA/Salud_Mental/programa-medicina-saludmental.pdf",
+    programa: "programas/programa-medicina-saludmental.pdf",
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -35,7 +35,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "07/05/2026",
-    programa: "Materias/MEDICINA/CURSADA/Comunitaria/programa-medicina-comunitaria.pdf",
+    programa: "programas/programa-medicina-comunitaria.pdf",
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -54,7 +54,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "28/05/2026",
-    programa: "Materias/MEDICINA/CURSADA/Arti_III/programa-medicina-articiii.pdf",
+    programa: "programas/programa-medicina-articiii.pdf",
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -92,7 +92,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "",
-    programa: "Materias/MEDICINA/CURSADA/Epidemiologia/programa-medicina-epidemio.pdf",
+    programa: "programas/programa-medicina-epidemio.pdf",
     campus: "",
     faltas: { actuales: 0, maximo: 3 },
     condiciones: [
@@ -133,7 +133,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "promocional",
     examen: "",
-    programa: "Materias/NUTRICION/Cursada/Matematicas/programa-nutricion-matematicas.pdf",
+    programa: "programas/programa-nutricion-matematicas.pdf",
     campus: "",
     faltas: { actuales: 1, maximo: 2 },
     condiciones: [
@@ -151,7 +151,7 @@ const MATERIAS = [
     cuatrimestre: "1° cuatrimestre",
     tipo: "regular",
     examen: "08/05/2026",
-    programa: "Materias/NUTRICION/Cursada/Quimica/programa-nutricion-quimicabasica.pdf",
+    programa: "programas/programa-nutricion-quimicabasica.pdf",
     campus: "",
     faltas: { actuales: 1, maximo: 3 },
     condiciones: [
