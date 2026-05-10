@@ -333,19 +333,26 @@ function renderPanelIzq(){
 
   // Buscar programa desde data.js (si la materia existe en MATERIAS de cursada)
   const PROGRAMAS_MAP = {
-    // Cursada actual
-    'salud-mental': 'programas/programa-medicina-saludmental.pdf',
-    'comunitaria': 'programas/programa-medicina-comunitaria.pdf',
-    'arti-iii': 'programas/programa-medicina-articiii.pdf',
-    'epidemio': 'programas/programa-medicina-epidemio.pdf',
-    'metodologia': 'programas/metodologia.pdf',
-    'matematicas': 'programas/programa-nutricion-matematicas.pdf',
-    'quimica-basica': 'programas/programa-nutricion-quimicabasica.pdf',
-    // Finales del plan
-    'med-17': 'programas/programa-salud-colectiva.pdf',
-    'nut-02': 'programas/programa-biologia.pdf',
-    'med-07': 'programas/programa-nacimiento.pdf',
-    'nut-06': 'programas/programa-anato.pdf',
+    // ── IDs de cursada actual ──
+    'salud-mental':  'programas/programa-medicina-saludmental.pdf',
+    'comunitaria':   'programas/programa-salud-colectiva.pdf',        // provisional hasta tener el PDF de comunitaria
+    'arti-iii':      'programas/programa-medicina-articiii.pdf',
+    'epidemio':      'programas/programa-medicina-epidemio.pdf',
+    'metodologia':   'programas/metodologia.pdf',
+    'matematicas':   'programas/programa-nutricion-matematicas.pdf',
+    'quimica-basica':'programas/programa-nutricion-quimicabasica.pdf',
+    // ── IDs del plan de finales ──
+    // Medicina
+    'med-16': 'programas/programa-medicina-saludmental.pdf',          // Salud Mental
+    'med-17': 'programas/programa-salud-colectiva.pdf',               // Salud Colectiva y Comunitaria
+    'med-14': 'programas/programa-medicina-articiii.pdf',             // Articulación Básico Clínico Com. III
+    'med-07': 'programas/programa-nacimiento.pdf',                    // Nacimiento (subir PDF cuando lo tengas)
+    // Nutrición
+    'nut-12': 'programas/metodologia.pdf',                            // Metodología de la Investigación
+    'nut-01': 'programas/programa-nutricion-matematicas.pdf',         // Matemática
+    'nut-02': 'programas/programa-biologia.pdf',                      // Biología
+    'nut-03': 'programas/programa-nutricion-quimicabasica.pdf',       // Química Básica
+    'nut-06': 'programas/programa-anato.pdf',                         // Anatomía y Fisiología (subir PDF cuando lo tengas)
   };
   const progUrl = PROGRAMAS_MAP[finalId] || '';
 
