@@ -753,9 +753,13 @@ function borrarCond(id, i) {
 
 // ── PROGRAMA ──
 function abrirPrograma(id) {
-  // primero localStorage (subido manualmente), luego data.js
+  // Los blob: URLs expiran al recargar la página — los descartamos y usamos la ruta del repo
   const blobUrl = localStorage.getItem('prog_url_'+id)||'';
-  if (blobUrl) { window.open(blobUrl, '_blank'); return; }
+  if (blobUrl && !blobUrl.startsWith('blob:')) {
+    window.open(blobUrl, '_blank'); return;
+  }
+  // Si había un blob guardado, lo limpiamos para no volver a caer acá
+  if (blobUrl.startsWith('blob:')) localStorage.removeItem('prog_url_'+id);
   const m = MATERIAS.find(x=>x.id===id) || getCustom().find(x=>x.id===id);
   const ruta = m?.programa||'';
   if (!ruta) { alert('No hay programa cargado para esta materia'); return; }
