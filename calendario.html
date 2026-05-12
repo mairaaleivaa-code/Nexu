@@ -28,7 +28,7 @@
   .date-chip { font-size:0.72rem; color:var(--text-muted); background:var(--surface2); padding:0.28rem 0.7rem; border-radius:20px; border:1px solid var(--border); }
 
   /* LAYOUT */
-  main { max-width:1100px; margin:0 auto; padding:1.25rem 1.5rem; }
+  main { max-width:1100px; margin:0 auto; padding:1.25rem 1.5rem 3rem; }
 
   /* CONTROLES MES */
   .cal-controls { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.1rem; flex-wrap:wrap; }
@@ -43,14 +43,14 @@
   .ley-dot { width:8px; height:8px; border-radius:3px; flex-shrink:0; }
 
   /* GRID DÍAS DE LA SEMANA */
-  .cal-head { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
+  .cal-head { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
   .cal-head-day { text-align:center; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); padding:0.3rem 0; }
 
   /* GRID CALENDARIO */
-  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 
   /* CELDA */
-  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:90px; padding:0.4rem 0.45rem; display:flex; flex-direction:column; gap:0.18rem; position:relative; transition:box-shadow 0.13s; }
+  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:110px; padding:0.45rem 0.5rem 0.6rem; display:flex; flex-direction:column; gap:0.22rem; position:relative; transition:box-shadow 0.13s; }
   .cal-cell:hover { box-shadow:0 2px 10px rgba(0,0,0,0.07); z-index:2; }
   .cal-cell.otro-mes { background:var(--bg); border-color:transparent; }
   .cal-cell.otro-mes .cal-num { color:var(--border); }
@@ -123,10 +123,12 @@
 
 <main>
   <div class="cal-controls">
-    <button class="btn-nav" onclick="cambiarMes(-1)">← Anterior</button>
     <div class="cal-mes-titulo" id="cal-titulo"></div>
-    <button class="btn-hoy" onclick="irAHoy()">Hoy</button>
-    <button class="btn-nav" onclick="cambiarMes(1)">Siguiente →</button>
+    <div style="display:flex;gap:0.4rem;align-items:center">
+      <button class="btn-nav" onclick="cambiarMes(-1)">← Anterior</button>
+      <button class="btn-hoy" onclick="irAHoy()">Hoy</button>
+      <button class="btn-nav" onclick="cambiarMes(1)">Siguiente →</button>
+    </div>
   </div>
 
   <div class="leyenda">
