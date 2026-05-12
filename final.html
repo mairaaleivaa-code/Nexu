@@ -82,6 +82,12 @@
 
   /* ADD TEMA */
   .add-row { display:flex; gap:0.4rem; margin-top:0.5rem; }
+  .dias-total-bar { display:flex; align-items:center; justify-content:space-between; padding:0.45rem 0; margin-top:0.5rem; border-top:1px solid var(--border); font-size:0.72rem; color:var(--text-muted); gap:0.5rem; flex-wrap:wrap; }
+  .dias-total-num { font-family:'Montserrat',sans-serif; font-weight:800; font-size:0.88rem; color:var(--text); }
+  .dias-total-cmp { font-size:0.68rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:6px; }
+  .dias-total-ok { background:var(--success-light); color:var(--success); }
+  .dias-total-warn { background:#fef3e2; color:var(--warning); }
+  .dias-total-danger { background:var(--danger-light); color:var(--danger); }
   .add-inp { flex:1; border:1px solid var(--border); border-radius:7px; padding:0.4rem 0.65rem; font-size:0.78rem; font-family:'DM Sans',sans-serif; background:var(--surface); outline:none; }
   .add-inp:focus { border-color:#93c5fd; }
   .btn-add { background:var(--text); color:white; border:none; border-radius:7px; padding:0.4rem 0.9rem; font-size:0.78rem; font-family:'DM Sans',sans-serif; cursor:pointer; }
@@ -129,19 +135,6 @@
     nav a { font-size:0.72rem; padding:0.28rem 0.55rem; }
     header { padding:0 0.85rem; }
   }
-
-  /* ── ANOTACIONES ── */
-  .anot-panel-f { display:none; background:var(--surface2); border-radius:8px; padding:0.6rem 0.75rem; margin-bottom:0.75rem; border:1px solid var(--border); }
-  .anot-panel-f.open { display:block; }
-  .anot-item { display:flex; align-items:flex-start; gap:0.45rem; padding:0.3rem 0; border-bottom:1px solid var(--border); font-size:0.75rem; line-height:1.4; }
-  .anot-item:last-child { border-bottom:none; }
-  .anot-texto { flex:1; color:var(--text); }
-  .anot-fecha { font-size:0.62rem; color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
-  .btn-del-anot { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.68rem; padding:0 2px; flex-shrink:0; }
-  .btn-del-anot:hover { color:var(--danger); }
-  .anot-input-row { display:flex; gap:0.28rem; margin-top:0.5rem; }
-  .anot-input { flex:1; border:1px solid var(--border); border-radius:5px; padding:0.28rem 0.5rem; font-size:0.72rem; font-family:'DM Sans',sans-serif; background:white; outline:none; color:var(--text); resize:none; }
-  .anot-input:focus { border-color:#93c5fd; }
 </style>
 </head>
 <body>
@@ -346,26 +339,19 @@ function renderPanelIzq(){
 
   // Buscar programa desde data.js (si la materia existe en MATERIAS de cursada)
   const PROGRAMAS_MAP = {
-    // ── IDs de cursada actual ──
-    'salud-mental':  'programas/programa-medicina-saludmental.pdf',
-    'comunitaria':   'programas/programa-salud-colectiva.pdf',        // provisional hasta tener el PDF de comunitaria
-    'arti-iii':      'programas/programa-medicina-articiii.pdf',
-    'epidemio':      'programas/programa-medicina-epidemio.pdf',
-    'metodologia':   'programas/metodologia.pdf',
-    'matematicas':   'programas/programa-nutricion-matematicas.pdf',
-    'quimica-basica':'programas/programa-nutricion-quimicabasica.pdf',
-    // ── IDs del plan de finales ──
-    // Medicina
-    'med-16': 'programas/programa-medicina-saludmental.pdf',          // Salud Mental
-    'med-17': 'programas/programa-salud-colectiva.pdf',               // Salud Colectiva y Comunitaria
-    'med-14': 'programas/programa-medicina-articiii.pdf',             // Articulación Básico Clínico Com. III
-    'med-07': 'programas/programa-nacimiento.pdf',                    // Nacimiento (subir PDF cuando lo tengas)
-    // Nutrición
-    'nut-12': 'programas/metodologia.pdf',                            // Metodología de la Investigación
-    'nut-01': 'programas/programa-nutricion-matematicas.pdf',         // Matemática
-    'nut-02': 'programas/programa-biologia.pdf',                      // Biología
-    'nut-03': 'programas/programa-nutricion-quimicabasica.pdf',       // Química Básica
-    'nut-06': 'programas/programa-anato.pdf',                         // Anatomía y Fisiología (subir PDF cuando lo tengas)
+    // Cursada actual
+    'salud-mental': 'programas/programa-medicina-saludmental.pdf',
+    'comunitaria': 'programas/programa-medicina-comunitaria.pdf',
+    'arti-iii': 'programas/programa-medicina-articiii.pdf',
+    'epidemio': 'programas/programa-medicina-epidemio.pdf',
+    'metodologia': 'programas/metodologia.pdf',
+    'matematicas': 'programas/programa-nutricion-matematicas.pdf',
+    'quimica-basica': 'programas/programa-nutricion-quimicabasica.pdf',
+    // Finales del plan
+    'med-17': 'programas/programa-salud-colectiva.pdf',
+    'nut-02': 'programas/programa-biologia.pdf',
+    'med-07': 'programas/programa-nacimiento.pdf',
+    'nut-06': 'programas/programa-anato.pdf',
   };
   const progUrl = PROGRAMAS_MAP[finalId] || '';
 
@@ -384,75 +370,27 @@ function renderPanelIzq(){
     <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
     <div class="prog-label" style="margin-bottom:0.75rem">${aprendidas}/${total} temas aprendidos · ${pct}%</div>
 
-    <button onclick="toggleAnotF()" style="font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:500;padding:0.3rem 0.72rem;border-radius:20px;border:1px dashed var(--border);background:transparent;color:var(--text-muted);cursor:pointer;margin-bottom:0.6rem;transition:all 0.15s" id="btn-anot-f">✏️ Anotaciones${getAnotF().length>0?' ('+getAnotF().length+')':''}</button>
-    <div class="anot-panel-f" id="anot-panel-f">
-      ${buildAnotPanelF()}
-    </div>
-
     <div class="sec-title">Temas del programa</div>
     ${items||'<div style="font-size:0.78rem;color:var(--text-muted);padding:0.5rem 0">Sin temas. Agregá los del programa abajo.</div>'}
 
+    ${(()=>{
+      const totalDias = temas.reduce((s,t)=>s+(parseInt(t.dias)||0),0);
+      if(totalDias===0) return '';
+      const dr = dias;
+      let cmpChip = '';
+      if(dr!==null && dr>=0) {
+        if(totalDias<=dr) cmpChip=`<span class="dias-total-cmp dias-total-ok">✓ entran en ${dr}d restantes</span>`;
+        else cmpChip=`<span class="dias-total-cmp dias-total-danger">⚠ faltan ${totalDias-dr}d extra</span>`;
+      } else if(dr!==null && dr<0) {
+        cmpChip=`<span class="dias-total-cmp dias-total-danger">Venció</span>`;
+      }
+      return `<div class="dias-total-bar"><span>📅 Total días estimados: <span class="dias-total-num">${totalDias}d</span></span>${cmpChip}</div>`;
+    })()}
     <div class="add-row" style="margin-top:0.75rem">
       <input class="add-inp" id="inp-tema" placeholder="Agregar tema..." onkeydown="if(event.key==='Enter')agregarTema()">
       <button class="btn-add" onclick="agregarTema()">+ Tema</button>
     </div>
   `;
-}
-
-// ── ANOTACIONES FINAL ──
-function getAnotF() { try{return JSON.parse(localStorage.getItem('anot_f_'+finalId)||'[]');}catch{return[];} }
-function setAnotF(l) { localStorage.setItem('anot_f_'+finalId,JSON.stringify(l)); }
-
-function toggleAnotF() {
-  const panel = document.getElementById('anot-panel-f');
-  if (panel) panel.classList.toggle('open');
-}
-
-function buildAnotPanelF() {
-  const lista = getAnotF();
-  const items = lista.length
-    ? lista.map((a,i) => `
-        <div class="anot-item">
-          <span class="anot-texto">${a.texto}</span>
-          <span class="anot-fecha">${a.fecha||''}</span>
-          <button class="btn-del-anot" onclick="borrarAnotF(${i})">×</button>
-        </div>`).join('')
-    : '<div style="font-size:0.73rem;color:var(--text-muted);padding:0.2rem 0">Sin anotaciones. Empezá a escribir abajo.</div>';
-  return `
-    <div style="font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:0.4rem">✏️ Anotaciones clave</div>
-    <div id="anot-list-f">${items}</div>
-    <div class="anot-input-row">
-      <textarea class="anot-input" id="anot-inp-f" rows="2" placeholder="Ej: El profe toma definición de Lalonde si o si..."
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();guardarAnotF();}"></textarea>
-      <button onclick="guardarAnotF()" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:0.28rem 0.55rem;font-size:0.72rem;cursor:pointer;color:var(--text-muted);align-self:flex-end">+</button>
-    </div>`;
-}
-
-function guardarAnotF() {
-  const inp = document.getElementById('anot-inp-f');
-  const txt = inp?.value.trim(); if (!txt) return;
-  const hoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
-  const l = getAnotF();
-  l.unshift({texto: txt, fecha: hoy});
-  setAnotF(l);
-  inp.value = '';
-  const list = document.getElementById('anot-list-f');
-  if (list) list.outerHTML = `<div id="anot-list-f">${l.map((a,i)=>`
-    <div class="anot-item">
-      <span class="anot-texto">${a.texto}</span>
-      <span class="anot-fecha">${a.fecha||''}</span>
-      <button class="btn-del-anot" onclick="borrarAnotF(${i})">×</button>
-    </div>`).join('')}</div>`;
-  const btn = document.getElementById('btn-anot-f');
-  if (btn) btn.textContent = '✏️ Anotaciones (' + l.length + ')';
-}
-
-function borrarAnotF(i) {
-  const l = getAnotF(); l.splice(i,1); setAnotF(l);
-  const panel = document.getElementById('anot-panel-f');
-  if (panel) { const wasOpen=panel.classList.contains('open'); panel.innerHTML=buildAnotPanelF(); if(wasOpen)panel.classList.add('open'); }
-  const btn = document.getElementById('btn-anot-f');
-  if (btn) btn.textContent = l.length>0?`✏️ Anotaciones (${l.length})`:'✏️ Anotaciones';
 }
 
 function toggleCheckTema(i){

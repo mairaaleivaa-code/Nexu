@@ -155,6 +155,12 @@
   .subtema-nombre.done { text-decoration:line-through; color:var(--text-muted); }
 
   .add-tema-section { padding:0.5rem 1.05rem; border-top:1px solid var(--surface2); }
+  .dias-total-bar { display:flex; align-items:center; justify-content:space-between; padding:0.4rem 1.05rem; background:var(--surface2); border-top:1px solid var(--border); font-size:0.72rem; color:var(--text-muted); gap:0.5rem; flex-wrap:wrap; }
+  .dias-total-num { font-family:'Montserrat',sans-serif; font-weight:800; font-size:0.88rem; color:var(--text); }
+  .dias-total-cmp { font-size:0.68rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:6px; }
+  .dias-total-ok { background:var(--success-light); color:var(--success); }
+  .dias-total-warn { background:#fef3e2; color:var(--warning); }
+  .dias-total-danger { background:var(--danger-light); color:var(--danger); }
   .add-row { display:flex; gap:0.28rem; }
   .add-input { flex:1; border:1px solid var(--border); border-radius:5px; padding:0.28rem 0.5rem; font-size:0.72rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; color:var(--text); }
   .add-input:focus { border-color:#93c5fd; background:white; }
@@ -305,17 +311,6 @@
   .repaso-counter { font-size:0.75rem; color:var(--text-muted); }
 
   .pend-panel-t, .notas-panel-t { display:none; background:var(--surface2); border-radius:8px; padding:0.6rem 0.75rem; margin-bottom:0.5rem; border:1px solid var(--border); }
-  .anot-panel-t { display:none; background:var(--surface2); border-radius:8px; padding:0.6rem 0.75rem; margin-bottom:0.5rem; border:1px solid var(--border); }
-  .anot-panel-t.open { display:block; }
-  .anot-item { display:flex; align-items:flex-start; gap:0.45rem; padding:0.3rem 0; border-bottom:1px solid var(--border); font-size:0.75rem; line-height:1.4; }
-  .anot-item:last-child { border-bottom:none; }
-  .anot-texto { flex:1; color:var(--text); }
-  .anot-fecha { font-size:0.62rem; color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
-  .btn-del-anot { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.68rem; padding:0 2px; flex-shrink:0; }
-  .btn-del-anot:hover { color:var(--danger); }
-  .anot-input-row { display:flex; gap:0.28rem; margin-top:0.5rem; }
-  .anot-input { flex:1; border:1px solid var(--border); border-radius:5px; padding:0.28rem 0.5rem; font-size:0.72rem; font-family:'DM Sans',sans-serif; background:white; outline:none; color:var(--text); resize:none; }
-  .anot-input:focus { border-color:#93c5fd; }
   .pend-panel-t.open, .notas-panel-t.open { display:block; }
   .pendiente-item { display:flex; align-items:center; gap:0.45rem; padding:0.28rem 0; border-bottom:1px solid var(--border); font-size:0.75rem; }
   .pendiente-item:last-child { border-bottom:none; }
@@ -526,62 +521,6 @@ function saveCondicionesExtra(id,l) { localStorage.setItem('cond_extra_'+id,JSON
 function getPendT(id) { try{return JSON.parse(localStorage.getItem('pend_'+id)||'[]');}catch{return[];} }
 function setPendT(id,l) { localStorage.setItem('pend_'+id,JSON.stringify(l)); }
 function getNotasT(id) { try{return JSON.parse(localStorage.getItem('notas_'+id)||'[]');}catch{return[];} }
-
-// ── ANOTACIONES ──
-function getAnotT(id) { try{return JSON.parse(localStorage.getItem('anot_'+id)||'[]');}catch{return[];} }
-function setAnotT(id,l) { localStorage.setItem('anot_'+id,JSON.stringify(l)); }
-
-function toggleAnotT(id) {
-  const panel = document.getElementById('anot-t-'+id);
-  if (!panel) return;
-  panel.classList.toggle('open');
-}
-
-function buildAnotPanelT(id) {
-  const lista = getAnotT(id);
-  const items = lista.length
-    ? lista.map((a,i) => `
-        <div class="anot-item">
-          <span class="anot-texto">${a.texto}</span>
-          <span class="anot-fecha">${a.fecha||''}</span>
-          <button class="btn-del-anot" onclick="borrarAnotT('${id}',${i})">×</button>
-        </div>`).join('')
-    : '<div style="font-size:0.73rem;color:var(--text-muted);padding:0.2rem 0">Sin anotaciones. Empezá a escribir abajo.</div>';
-  return `
-    <div style="font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:0.4rem">✏️ Anotaciones clave</div>
-    <div id="anot-list-${id}">${items}</div>
-    <div class="anot-input-row">
-      <textarea class="anot-input" id="anot-inp-${id}" rows="2" placeholder="Ej: La profe pide definición de Lalonde si o si..."
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();guardarAnotT('${id}');}"></textarea>
-      <button class="btn-add-cond" onclick="guardarAnotT('${id}')" style="align-self:flex-end">+</button>
-    </div>`;
-}
-
-function guardarAnotT(id) {
-  const inp = document.getElementById('anot-inp-'+id);
-  const txt = inp?.value.trim(); if (!txt) return;
-  const hoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
-  const l = getAnotT(id);
-  l.unshift({texto: txt, fecha: hoy});
-  setAnotT(id, l);
-  inp.value = '';
-  const list = document.getElementById('anot-list-'+id);
-  if (list) list.outerHTML = `<div id="anot-list-${id}">${l.map((a,i)=>`
-    <div class="anot-item">
-      <span class="anot-texto">${a.texto}</span>
-      <span class="anot-fecha">${a.fecha||''}</span>
-      <button class="btn-del-anot" onclick="borrarAnotT('${id}',${i})">×</button>
-    </div>`).join('')}</div>`;
-  // Actualizar contador en el botón
-  const btns = document.querySelectorAll('.btn-add-parcial');
-  btns.forEach(b => { if(b.textContent.startsWith('✏️')) b.textContent = `✏️ Anotaciones (${l.length})`; });
-}
-
-function borrarAnotT(id, i) {
-  const l = getAnotT(id); l.splice(i,1); setAnotT(id,l);
-  const panel = document.getElementById('anot-t-'+id);
-  if (panel) { const wasOpen=panel.classList.contains('open'); panel.innerHTML=buildAnotPanelT(id); if(wasOpen)panel.classList.add('open'); }
-}
 function setNotasT(id,l) { localStorage.setItem('notas_'+id,JSON.stringify(l)); }
 function getParcialesExtraT(id) { try{return JSON.parse(localStorage.getItem('parciales_extra_'+id)||'[]');}catch{return[];} }
 function getCustomT() { try{return JSON.parse(localStorage.getItem('materias_custom')||'[]');}catch{return[];} }
@@ -721,8 +660,6 @@ function buildPanelLeft(m) {
   const pendLista = getPendT(m.id);
   const pendCount = pendLista.filter(p=>!p.done).length;
   const notasLista = getNotasT(m.id);
-  const anotLista = getAnotT(m.id);
-  const anotCount = anotLista.length;
 
   // Próximo parcial
   const todosParc = [...(m.parciales||[]), ...getParcialesExtraT(m.id)];
@@ -798,9 +735,6 @@ function buildPanelLeft(m) {
       <button class="btn-add-parcial" onclick="togglePendT('${m.id}')">✅ Pendientes${pendCount>0?` (${pendCount})`:''}
       </button>
       <button class="btn-add-parcial" onclick="toggleNotasT('${m.id}')">📊 Notas</button>
-      <button class="btn-add-parcial" onclick="toggleAnotT('${m.id}')">✏️ Anotaciones${anotCount>0?` (${anotCount})`:''}
-      </button>
-      ${m.programa?`<button class="btn-add-parcial" onclick="window.open('${m.programa}','_blank')">📋 Programa</button>`:''}
     </div>
 
     <div class="pend-panel-t" id="pend-t-${m.id}">
@@ -808,9 +742,6 @@ function buildPanelLeft(m) {
     </div>
     <div class="notas-panel-t" id="notas-t-${m.id}">
       ${buildNotasPanelT(m.id)}
-    </div>
-    <div class="anot-panel-t" id="anot-t-${m.id}">
-      ${buildAnotPanelT(m.id)}
     </div>
 
     <div style="height:1px;background:var(--border);margin-bottom:0.85rem"></div>
@@ -977,6 +908,21 @@ function buildTemarioCard(m, parcialId, parcial) {
       <div class="unidades-list" id="ulist-${cardId}">
         ${temasHTML||'<div style="padding:0.6rem 1.05rem;font-size:0.75rem;color:var(--text-muted)">Agregá la primera unidad abajo.</div>'}
       </div>
+      ${(()=>{
+        const totalDias = temas.reduce((s,t)=>s+(parseInt(t.dias)||0),0);
+        if(totalDias===0) return '';
+        // días restantes al examen de este parcial (o examen general)
+        const fechaRef = parcial?.fecha || m.examen || '';
+        const dr = fechaRef ? diasRestantes(fechaRef) : null;
+        let cmpChip = '';
+        if(dr!==null && dr>=0) {
+          if(totalDias<=dr) cmpChip=`<span class="dias-total-cmp dias-total-ok">✓ entran en ${dr}d restantes</span>`;
+          else cmpChip=`<span class="dias-total-cmp dias-total-danger">⚠ faltan ${totalDias-dr}d extra</span>`;
+        } else if(dr!==null && dr<0) {
+          cmpChip=`<span class="dias-total-cmp dias-total-danger">Venció</span>`;
+        }
+        return `<div class="dias-total-bar"><span>📅 Total días estimados: <span class="dias-total-num">${totalDias}d</span></span>${cmpChip}</div>`;
+      })()}
       <div class="add-tema-section">
         <div class="add-row">
           <input class="add-input" id="tinput-${cardId}" placeholder="Agregar unidad..." onkeydown="if(event.key==='Enter')agregarTema('${m.id}','${parcialId}','${cardId}')">
