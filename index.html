@@ -220,6 +220,41 @@
   .btn-add-nota { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:0.26rem 0.55rem; font-size:0.72rem; cursor:pointer; color:var(--text-muted); white-space:nowrap; }
   .btn-add-nota:hover { background:var(--surface2); }
 
+
+  /* ── MANTÉN EL RITMO ── */
+  .ritmo-section { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:1.25rem; }
+  .ritmo-header { padding:0.85rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap; }
+  .ritmo-titulo { font-family:'Montserrat',sans-serif; font-size:0.92rem; font-weight:700; }
+  .ritmo-frase { font-size:0.72rem; color:var(--text-muted); font-style:italic; }
+  .ritmo-empty { padding:1.25rem; text-align:center; color:var(--text-muted); font-size:0.8rem; line-height:1.6; }
+  .ritmo-lista { padding:0.4rem 0; }
+  .ritmo-item { display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:0.75rem; padding:0.6rem 1.25rem; border-bottom:1px solid var(--surface2); transition:background 0.13s; }
+  .ritmo-item:last-child { border-bottom:none; }
+  .ritmo-item:hover { background:var(--surface2); }
+  .ritmo-badge { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+  .ritmo-badge.urgente { background:var(--danger-light); }
+  .ritmo-badge.pronto { background:var(--warning-light); }
+  .ritmo-badge.ok { background:var(--success-light); }
+  .ritmo-badge.sin-fecha { background:var(--surface2); }
+  .ritmo-info { min-width:0; }
+  .ritmo-nombre { font-weight:600; font-size:0.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ritmo-meta { font-size:0.68rem; color:var(--text-muted); margin-top:0.1rem; display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; }
+  .ritmo-estado-chip { font-size:0.6rem; font-weight:700; padding:0.1rem 0.38rem; border-radius:5px; text-transform:uppercase; letter-spacing:0.03em; }
+  .re-sin-empezar { background:var(--surface2); color:var(--text-muted); }
+  .re-leido { background:var(--med-bg); color:var(--med-color); }
+  .re-estudiado { background:var(--warning-light); color:var(--warning); }
+  .ritmo-dias-chip { font-size:0.68rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:7px; white-space:nowrap; flex-shrink:0; }
+  .ritmo-dias-urgente { background:var(--danger-light); color:var(--danger); }
+  .ritmo-dias-pronto { background:var(--warning-light); color:var(--warning); }
+  .ritmo-dias-ok { background:var(--success-light); color:var(--success); }
+  .ritmo-dias-sf { background:var(--surface2); color:var(--text-muted); }
+  .btn-ritmo-ir { font-family:'DM Sans',sans-serif; font-size:0.68rem; font-weight:500; padding:0.25rem 0.6rem; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; text-decoration:none; white-space:nowrap; transition:all 0.13s; flex-shrink:0; }
+  .btn-ritmo-ir:hover { background:var(--text); color:white; border-color:var(--text); }
+  @media(max-width:600px) {
+    .ritmo-item { grid-template-columns:auto 1fr auto; }
+    .ritmo-dias-chip { display:none; }
+  }
+
   @media(max-width:1024px) { .materias-grid { grid-template-columns:repeat(2,1fr); } }
   @media(max-width:600px) {
     .materias-grid { grid-template-columns:1fr; }
@@ -282,6 +317,17 @@
   </div>
 
   <div class="materias-grid" id="materias-grid"></div>
+
+  <!-- ── MANTÉN EL RITMO ── -->
+  <div class="ritmo-section" id="ritmo-section">
+    <div class="ritmo-header">
+      <div>
+        <div class="ritmo-titulo">🔥 Mantén el ritmo</div>
+        <div class="ritmo-frase" id="ritmo-frase">"Un 1% cada día."</div>
+      </div>
+    </div>
+    <div id="ritmo-body"></div>
+  </div>
 
   <div class="finales-section" style="margin-top:0">
     <div class="finales-header">
@@ -753,13 +799,9 @@ function borrarCond(id, i) {
 
 // ── PROGRAMA ──
 function abrirPrograma(id) {
-  // Los blob: URLs expiran al recargar la página — los descartamos y usamos la ruta del repo
+  // primero localStorage (subido manualmente), luego data.js
   const blobUrl = localStorage.getItem('prog_url_'+id)||'';
-  if (blobUrl && !blobUrl.startsWith('blob:')) {
-    window.open(blobUrl, '_blank'); return;
-  }
-  // Si había un blob guardado, lo limpiamos para no volver a caer acá
-  if (blobUrl.startsWith('blob:')) localStorage.removeItem('prog_url_'+id);
+  if (blobUrl) { window.open(blobUrl, '_blank'); return; }
   const m = MATERIAS.find(x=>x.id===id) || getCustom().find(x=>x.id===id);
   const ruta = m?.programa||'';
   if (!ruta) { alert('No hay programa cargado para esta materia'); return; }
@@ -1391,9 +1433,103 @@ function importarDatos(input){
   });
   if(cambio) setFinales(lista);
 })();
+
+// ── MANTÉN EL RITMO ──
+const FRASES_RITMO = [
+  '"Un 1% cada día."',
+  '"Constancia > intensidad."',
+  '"Cinco minutos cuentan."',
+  '"No rompas la racha."',
+  '"Pequeño esfuerzo, gran diferencia."',
+  '"Hoy es mejor que mañana."',
+  '"Repasar es recordar."',
+];
+
+function renderRitmo() {
+  const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const fraseEl = document.getElementById('ritmo-frase');
+  if (fraseEl) fraseEl.textContent = FRASES_RITMO[doy % FRASES_RITMO.length];
+
+  const finales = getFinales();
+  const items = [];
+
+  finales.forEach(f => {
+    const temas = (() => { try { return JSON.parse(localStorage.getItem('final_unidades_'+f.planId)||'[]'); } catch{ return []; } })();
+    const dr = f.fecha ? diasRestantes(f.fecha) : null;
+
+    temas.forEach((t, ti) => {
+      const estado = t.estado || 'sin-empezar';
+      if (estado === 'aprendido') return;
+
+      const key = 'ritmo_last_'+f.planId+'_'+ti;
+      const lastTocado = localStorage.getItem(key) ? parseInt(localStorage.getItem(key)) : 0;
+      const diasDormido = lastTocado ? Math.floor((Date.now() - lastTocado) / 86400000) : 999;
+
+      let nivel = null;
+      if (dr !== null && dr >= 0 && dr <= 15) nivel = 'urgente';
+      else if (dr !== null && dr >= 0 && dr <= 30 && diasDormido >= 5) nivel = 'urgente';
+      else if (dr !== null && dr >= 0 && dr <= 30) nivel = 'pronto';
+      else if (diasDormido >= 3) nivel = 'ok';
+
+      if (!nivel) return;
+      items.push({ f, t, ti, dr, diasDormido, nivel, estado });
+    });
+  });
+
+  const orden = { urgente: 0, pronto: 1, ok: 2 };
+  items.sort((a, b) => {
+    if (orden[a.nivel] !== orden[b.nivel]) return orden[a.nivel] - orden[b.nivel];
+    return (a.dr ?? 9999) - (b.dr ?? 9999);
+  });
+
+  const body = document.getElementById('ritmo-body');
+  const section = document.getElementById('ritmo-section');
+  if (!body || !section) return;
+
+  if (!items.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const iconos = { urgente: '🔴', pronto: '🟡', ok: '🟢' };
+  const badgeCls = { urgente: 'urgente', pronto: 'pronto', ok: 'ok' };
+  const estadoLabel = { 'sin-empezar': 'Sin empezar', 'leido': 'Leído', 'estudiado': 'Estudiado' };
+  const estadoCls   = { 'sin-empezar': 're-sin-empezar', 'leido': 're-leido', 'estudiado': 're-estudiado' };
+
+  const html = items.slice(0, 12).map(({ f, t, ti, dr, diasDormido, nivel, estado }) => {
+    const chipCls = f.carrera === 'Medicina' ? 'chip-medicina' : 'chip-nutricion';
+    const diasChipCls = dr === null ? 'ritmo-dias-sf'
+      : dr <= 15 ? 'ritmo-dias-urgente'
+      : dr <= 30 ? 'ritmo-dias-pronto' : 'ritmo-dias-ok';
+    const diasLabel = dr === null ? 'Sin fecha' : dr < 0 ? 'Venció' : `${dr}d al final`;
+    const dormidoLabel = diasDormido >= 999 ? 'Nunca repasado'
+      : diasDormido === 0 ? 'Visto hoy' : `Hace ${diasDormido}d sin ver`;
+
+    return `
+      <div class="ritmo-item">
+        <div class="ritmo-badge ${badgeCls[nivel]}">${iconos[nivel]}</div>
+        <div class="ritmo-info">
+          <div class="ritmo-nombre">${t.nombre}</div>
+          <div class="ritmo-meta">
+            <span class="carrera-chip ${chipCls}" style="font-size:0.58rem">${f.nombre}</span>
+            <span class="ritmo-estado-chip ${estadoCls[estado]}">${estadoLabel[estado]||estado}</span>
+            <span>${dormidoLabel}</span>
+          </div>
+        </div>
+        <span class="ritmo-dias-chip ${diasChipCls}">${diasLabel}</span>
+        <a class="btn-ritmo-ir" href="final.html?id=${f.planId}" onclick="marcarVisto('${f.planId}',${ti})">Ver →</a>
+      </div>`;
+  }).join('');
+
+  body.innerHTML = `<div class="ritmo-lista">${html}</div>`;
+}
+
+function marcarVisto(planId, ti) {
+  localStorage.setItem('ritmo_last_'+planId+'_'+ti, Date.now().toString());
+}
+
 renderMaterias();
 renderFinales();
 renderMesas();
+renderRitmo();
 </script>
 </body>
 </html>
