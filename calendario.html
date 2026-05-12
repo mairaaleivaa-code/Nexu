@@ -240,18 +240,9 @@ function recolectarEventos() {
     }
   }
 
-  // 1. MATERIAS DE CURSADA — parciales y examen
+  // 1. MATERIAS DE CURSADA — solo parciales (base + extra)
   const todasMaterias = [...(MATERIAS||[]), ...(ls('materias_custom')||[])];
   todasMaterias.forEach(m => {
-    const ov = ls('ov_'+m.id)||{};
-    const examen = ov.examen || m.examen || '';
-    if (examen) agregar(examen, {
-      tipo:'examen', cls:'ev-examen',
-      texto: `Examen ${m.nombre}`,
-      sub: m.carrera, dot:'#c1440e'
-    });
-
-    // Parciales base + extra
     const parcsBase = m.parciales||[];
     const parcsExtra = ls('parciales_extra_'+m.id)||[];
     [...parcsBase, ...parcsExtra].forEach(p => {
@@ -291,11 +282,19 @@ function recolectarEventos() {
     });
   });
 
-  // 3. MESAS DE EXAMEN
+  // 3. MESAS DE EXAMEN — solo en el día de inicio, mostrando rango completo
   MESAS_2026.forEach(mesa => {
-    agregarRango(mesa.fecha, mesa.hasta, {
+    const dInicio = parseFecha(mesa.fecha);
+    const dHasta  = parseFecha(mesa.hasta);
+    if (!dInicio || !dHasta) return;
+    // Formatear: "04–11/05"
+    const dI = String(dInicio.getDate()).padStart(2,'0');
+    const dF = String(dHasta.getDate()).padStart(2,'0');
+    const mes = String(dHasta.getMonth()+1).padStart(2,'0');
+    const rangoStr = `${dI}–${dF}/${mes}`;
+    agregar(mesa.fecha, {
       tipo:'mesa', cls:'ev-mesa',
-      texto: `Mesa ${mesa.label}`,
+      texto: `Mesa ${mesa.label} ${rangoStr}`,
       sub: 'Mesa de examen', dot:'#9333ea'
     });
   });
