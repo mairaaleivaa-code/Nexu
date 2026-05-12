@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario · Nexu</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f2f1ee; --surface:#fff; --surface2:#f0ede8; --border:#e2ddd6;
+    --text:#1a1714; --text-muted:#8a8077;
+    --med-color:#2563a8; --med-bg:#dbeeff; --med-border:#93c5fd;
+    --nut-color:#9b1c3a; --nut-bg:#fde8ee; --nut-border:#f9a8c0;
+    --danger:#c1440e; --danger-light:#fce8e0;
+    --warning:#b5651d; --warning-light:#fef3e2;
+    --success:#2d6a4f; --success-light:#d8f3dc;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  /* HEADER */
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.75rem; height:54px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+  .logo { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; }
+  .logo span { color:var(--med-color); }
+  nav { display:flex; gap:0.2rem; }
+  nav a { text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:500; padding:0.38rem 0.75rem; border-radius:7px; transition:all 0.15s; }
+  nav a:hover, nav a.active { background:var(--surface2); color:var(--text); }
+  .date-chip { font-size:0.72rem; color:var(--text-muted); background:var(--surface2); padding:0.28rem 0.7rem; border-radius:20px; border:1px solid var(--border); }
+
+  /* LAYOUT */
+  main { max-width:1100px; margin:0 auto; padding:1.25rem 1.5rem; }
+
+  /* CONTROLES MES */
+  .cal-controls { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.1rem; flex-wrap:wrap; }
+  .cal-mes-titulo { font-family:'Montserrat',sans-serif; font-size:1.2rem; font-weight:800; letter-spacing:-0.02em; flex:1; }
+  .btn-nav { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.3rem 0.75rem; font-size:0.82rem; cursor:pointer; color:var(--text-muted); font-family:'DM Sans',sans-serif; transition:all 0.13s; }
+  .btn-nav:hover { background:var(--surface2); color:var(--text); }
+  .btn-hoy { background:var(--text); color:white; border:none; border-radius:8px; padding:0.32rem 0.85rem; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
+
+  /* LEYENDA */
+  .leyenda { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .ley-item { display:flex; align-items:center; gap:0.28rem; font-size:0.65rem; color:var(--text-muted); }
+  .ley-dot { width:8px; height:8px; border-radius:3px; flex-shrink:0; }
+
+  /* GRID DÍAS DE LA SEMANA */
+  .cal-head { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
+  .cal-head-day { text-align:center; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); padding:0.3rem 0; }
+
+  /* GRID CALENDARIO */
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+
+  /* CELDA */
+  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:90px; padding:0.4rem 0.45rem; display:flex; flex-direction:column; gap:0.18rem; position:relative; transition:box-shadow 0.13s; }
+  .cal-cell:hover { box-shadow:0 2px 10px rgba(0,0,0,0.07); z-index:2; }
+  .cal-cell.otro-mes { background:var(--bg); border-color:transparent; }
+  .cal-cell.otro-mes .cal-num { color:var(--border); }
+  .cal-cell.es-hoy { border-color:var(--med-color); border-width:2px; }
+  .cal-cell.es-hoy .cal-num { color:var(--med-color); font-weight:800; }
+  .cal-cell.tiene-eventos { cursor:default; }
+
+  .cal-num { font-family:'Montserrat',sans-serif; font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:0.1rem; display:flex; align-items:center; justify-content:space-between; }
+  .btn-add-evento { background:none; border:none; cursor:pointer; color:var(--border); font-size:0.8rem; line-height:1; padding:0; transition:color 0.13s; display:none; }
+  .cal-cell:hover .btn-add-evento { display:block; color:var(--text-muted); }
+  .btn-add-evento:hover { color:var(--text); }
+
+  /* CHIPS DE EVENTOS */
+  .ev { font-size:0.6rem; font-weight:600; padding:0.12rem 0.38rem; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.4; cursor:default; }
+  .ev-parcial  { background:#fce8e0; color:#c1440e; border-left:2px solid #c1440e; }
+  .ev-examen   { background:#fce8e0; color:#c1440e; border-left:2px solid #c1440e; }
+  .ev-final    { background:var(--success-light); color:var(--success); border-left:2px solid var(--success); }
+  .ev-mesa     { background:#f3e8ff; color:#6b21a8; border-left:2px solid #9333ea; }
+  .ev-tema     { background:var(--med-bg); color:var(--med-color); border-left:2px solid var(--med-color); }
+  .ev-tema-nut { background:var(--nut-bg); color:var(--nut-color); border-left:2px solid var(--nut-color); }
+  .ev-manual   { background:var(--warning-light); color:var(--warning); border-left:2px solid var(--warning); }
+  .ev-mas      { background:var(--surface2); color:var(--text-muted); border-left:2px solid var(--border); font-style:italic; }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.32); z-index:1000; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--surface); border-radius:14px; padding:1.4rem; width:420px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.15); }
+  .modal-title { font-family:'Montserrat',sans-serif; font-size:1rem; font-weight:700; margin-bottom:0.25rem; }
+  .modal-fecha { font-size:0.75rem; color:var(--text-muted); margin-bottom:1rem; }
+  .modal-eventos-list { margin-bottom:1rem; }
+  .modal-ev-item { display:flex; align-items:flex-start; gap:0.5rem; padding:0.45rem 0; border-bottom:1px solid var(--surface2); }
+  .modal-ev-item:last-child { border-bottom:none; }
+  .modal-ev-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; margin-top:4px; }
+  .modal-ev-texto { flex:1; font-size:0.8rem; line-height:1.4; }
+  .modal-ev-sub { font-size:0.68rem; color:var(--text-muted); margin-top:0.1rem; }
+  .modal-ev-del { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.72rem; padding:2px; }
+  .modal-ev-del:hover { color:var(--danger); }
+  .modal-sep { height:1px; background:var(--border); margin:0.75rem 0; }
+  .modal-add-title { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem; }
+  .modal-inp { width:100%; border:1px solid var(--border); border-radius:7px; padding:0.45rem 0.7rem; font-size:0.8rem; font-family:'DM Sans',sans-serif; background:var(--surface2); color:var(--text); outline:none; margin-bottom:0.45rem; }
+  .modal-inp:focus { border-color:var(--med-border); background:white; }
+  .modal-actions { display:flex; gap:0.4rem; justify-content:flex-end; }
+  .btn-cancel { padding:0.4rem 0.9rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.78rem; cursor:pointer; color:var(--text-muted); }
+  .btn-save { padding:0.4rem 0.9rem; border-radius:7px; border:none; background:var(--text); color:white; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:500; cursor:pointer; }
+
+  @media(max-width:700px) {
+    main { padding:0.75rem; }
+    header { padding:0 0.85rem; }
+    .cal-cell { min-height:60px; padding:0.28rem; }
+    .ev { font-size:0.55rem; padding:0.08rem 0.25rem; }
+    .cal-mes-titulo { font-size:1rem; }
+    nav a { font-size:0.7rem; padding:0.28rem 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <div class="logo">Ne<span>xu</span></div>
+    <div class="date-chip" id="fecha-hoy"></div>
+  </div>
+  <nav>
+    <a href="calendario.html" class="active">Calendario</a>
+    <a href="index.html">Inicio</a>
+    <a href="plan.html">Plan</a>
+    <a href="registro.html">Registro</a>
+  </nav>
+</header>
+
+<main>
+  <div class="cal-controls">
+    <button class="btn-nav" onclick="cambiarMes(-1)">← Anterior</button>
+    <div class="cal-mes-titulo" id="cal-titulo"></div>
+    <button class="btn-hoy" onclick="irAHoy()">Hoy</button>
+    <button class="btn-nav" onclick="cambiarMes(1)">Siguiente →</button>
+  </div>
+
+  <div class="leyenda">
+    <div class="ley-item"><div class="ley-dot" style="background:#c1440e"></div> Parcial / Examen</div>
+    <div class="ley-item"><div class="ley-dot" style="background:var(--success)"></div> Final</div>
+    <div class="ley-item"><div class="ley-dot" style="background:#9333ea"></div> Mesa de examen</div>
+    <div class="ley-item"><div class="ley-dot" style="background:var(--med-color)"></div> Tema a estudiar (Med)</div>
+    <div class="ley-item"><div class="ley-dot" style="background:var(--nut-color)"></div> Tema a estudiar (Nut)</div>
+    <div class="ley-item"><div class="ley-dot" style="background:var(--warning)"></div> Manual</div>
+  </div>
+
+  <div class="cal-head">
+    <div class="cal-head-day">Lun</div>
+    <div class="cal-head-day">Mar</div>
+    <div class="cal-head-day">Mié</div>
+    <div class="cal-head-day">Jue</div>
+    <div class="cal-head-day">Vie</div>
+    <div class="cal-head-day">Sáb</div>
+    <div class="cal-head-day">Dom</div>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</main>
+
+<!-- MODAL DÍA -->
+<div class="modal-overlay" id="modal-dia">
+  <div class="modal">
+    <div class="modal-title" id="modal-dia-titulo"></div>
+    <div class="modal-fecha" id="modal-dia-fecha"></div>
+    <div class="modal-eventos-list" id="modal-dia-eventos"></div>
+    <div class="modal-sep"></div>
+    <div class="modal-add-title">Agregar evento manual</div>
+    <input class="modal-inp" id="modal-inp-texto" placeholder="Ej: Repaso con compañera, Feriado..." 
+      onkeydown="if(event.key==='Enter')guardarManual()">
+    <select class="modal-inp" id="modal-inp-tipo">
+      <option value="manual">📝 Evento general</option>
+      <option value="manual-estudio">📚 Sesión de estudio</option>
+      <option value="manual-otro">📌 Otro</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cerrar</button>
+      <button class="btn-save" onclick="guardarManual()">+ Agregar</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// ── UTILS ──
+function ls(k) { try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;} }
+function lsSet(k,v) { localStorage.setItem(k,JSON.stringify(v)); }
+
+function parseFecha(str) {
+  if (!str) return null;
+  if (str.includes('-')) { const [y,m,d]=str.split('-'); return new Date(+y,+m-1,+d); }
+  const [d,m,y]=str.split('/'); return new Date(+y,+m-1,+d);
+}
+function toKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+function formatDiaLargo(date) {
+  return date.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+const HOY = new Date(); HOY.setHours(0,0,0,0);
+document.getElementById('fecha-hoy').textContent = HOY.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+
+// ── ESTADO ──
+let mesActual = HOY.getMonth();
+let anioActual = HOY.getFullYear();
+let diaModalKey = null; // key YYYY-MM-DD del modal abierto
+
+// ── MESAS ──
+const MESAS_2026 = [
+  { label:'Feb', fecha:'18/02/2026', hasta:'25/02/2026' },
+  { label:'Mar 1°', fecha:'05/03/2025', hasta:'12/03/2025' },
+  { label:'Mar 2°', fecha:'16/03/2026', hasta:'23/03/2026' },
+  { label:'Mayo', fecha:'04/05/2026', hasta:'11/05/2026' },
+  { label:'Jun', fecha:'09/06/2026', hasta:'16/06/2026' },
+  { label:'Jul', fecha:'01/07/2026', hasta:'08/07/2026' },
+  { label:'Ago 1°', fecha:'10/08/2026', hasta:'15/08/2026' },
+  { label:'Ago 2°', fecha:'20/08/2026', hasta:'26/08/2026' },
+  { label:'Oct', fecha:'16/10/2026', hasta:'23/10/2026' },
+  { label:'Nov', fecha:'06/11/2026', hasta:'13/11/2026' },
+  { label:'Dic', fecha:'01/12/2026', hasta:'09/12/2026' },
+];
+
+// ── RECOLECTAR EVENTOS ──
+function recolectarEventos() {
+  const evMap = {}; // key YYYY-MM-DD → array de eventos
+
+  function agregar(dateOrStr, ev) {
+    if (!dateOrStr) return;
+    const d = typeof dateOrStr === 'string' ? parseFecha(dateOrStr) : dateOrStr;
+    if (!d || isNaN(d)) return;
+    const k = toKey(d);
+    if (!evMap[k]) evMap[k] = [];
+    evMap[k].push(ev);
+  }
+
+  function agregarRango(desdeStr, hastaStr, ev) {
+    if (!desdeStr) return;
+    const desde = parseFecha(desdeStr);
+    const hasta = hastaStr ? parseFecha(hastaStr) : desde;
+    if (!desde || isNaN(desde)) return;
+    const cur = new Date(desde);
+    while (cur <= hasta) {
+      const k = toKey(cur);
+      if (!evMap[k]) evMap[k] = [];
+      evMap[k].push({...ev, esRango:true});
+      cur.setDate(cur.getDate()+1);
+    }
+  }
+
+  // 1. MATERIAS DE CURSADA — parciales y examen
+  const todasMaterias = [...(MATERIAS||[]), ...(ls('materias_custom')||[])];
+  todasMaterias.forEach(m => {
+    const ov = ls('ov_'+m.id)||{};
+    const examen = ov.examen || m.examen || '';
+    if (examen) agregar(examen, {
+      tipo:'examen', cls:'ev-examen',
+      texto: `Examen ${m.nombre}`,
+      sub: m.carrera, dot:'#c1440e'
+    });
+
+    // Parciales base + extra
+    const parcsBase = m.parciales||[];
+    const parcsExtra = ls('parciales_extra_'+m.id)||[];
+    [...parcsBase, ...parcsExtra].forEach(p => {
+      if (p.fecha) agregar(p.fecha, {
+        tipo:'parcial', cls:'ev-parcial',
+        texto: `${p.nombre} · ${m.nombre}`,
+        sub: m.carrera, dot:'#c1440e'
+      });
+    });
+  });
+
+  // 2. FINALES — fecha de examen
+  const finales = ls('finales')||[];
+  finales.forEach(f => {
+    if (f.fecha) agregar(f.fecha, {
+      tipo:'final', cls:'ev-final',
+      texto: `Final ${f.nombre}`,
+      sub: f.carrera, dot:'var(--success)',
+      link: `final.html?id=${f.planId}`
+    });
+
+    // Temas con fechas de estudio
+    const temas = ls('final_unidades_'+f.planId)||[];
+    temas.forEach((t,ti) => {
+      if (!t.fechaInicio && !t.fechaFin) return;
+      if (t.estado === 'aprendido') return;
+      const cls = f.carrera==='Medicina'?'ev-tema':'ev-tema-nut';
+      const dot = f.carrera==='Medicina'?'var(--med-color)':'var(--nut-color)';
+      const textoCorto = t.nombre.length>22 ? t.nombre.slice(0,20)+'…' : t.nombre;
+      agregarRango(t.fechaInicio, t.fechaFin, {
+        tipo:'tema', cls,
+        texto: textoCorto,
+        sub: f.nombre,
+        dot,
+        link: `final.html?id=${f.planId}`
+      });
+    });
+  });
+
+  // 3. MESAS DE EXAMEN
+  MESAS_2026.forEach(mesa => {
+    agregarRango(mesa.fecha, mesa.hasta, {
+      tipo:'mesa', cls:'ev-mesa',
+      texto: `Mesa ${mesa.label}`,
+      sub: 'Mesa de examen', dot:'#9333ea'
+    });
+  });
+
+  // 4. MANUALES
+  const manuales = ls('cal_manuales')||[];
+  manuales.forEach(e => {
+    agregar(e.fecha, {
+      tipo:'manual', cls:'ev-manual',
+      texto: e.texto,
+      sub: 'Manual', dot:'var(--warning)',
+      id: e.id
+    });
+  });
+
+  return evMap;
+}
+
+// ── RENDER CALENDARIO ──
+function render() {
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-titulo').textContent = `${MESES[mesActual]} ${anioActual}`;
+
+  const evMap = recolectarEventos();
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Primer día del mes (lunes = 0)
+  const primerDia = new Date(anioActual, mesActual, 1);
+  let startDow = primerDia.getDay(); // 0=dom
+  startDow = startDow === 0 ? 6 : startDow - 1; // convertir a lunes=0
+
+  const diasEnMes = new Date(anioActual, mesActual+1, 0).getDate();
+  const totalCeldas = Math.ceil((startDow + diasEnMes) / 7) * 7;
+
+  for (let i = 0; i < totalCeldas; i++) {
+    const diaOffset = i - startDow + 1;
+    const fecha = new Date(anioActual, mesActual, diaOffset);
+    const esEsteMes = fecha.getMonth() === mesActual;
+    const esHoy = toKey(fecha) === toKey(HOY);
+    const key = toKey(fecha);
+    const eventos = evMap[key] || [];
+
+    // Priorizar: no mostrar duplicados de rango (solo 1 chip por tipo-texto por día)
+    const vistos = new Set();
+    const evsFiltrados = eventos.filter(e => {
+      const k = e.tipo+e.texto;
+      if (vistos.has(k)) return false;
+      vistos.add(k); return true;
+    });
+
+    const MAX_CHIPS = 3;
+    const chips = evsFiltrados.slice(0, MAX_CHIPS).map(e =>
+      `<div class="ev ${e.cls}" title="${e.texto} · ${e.sub||''}">${e.texto}</div>`
+    ).join('');
+    const extra = evsFiltrados.length > MAX_CHIPS
+      ? `<div class="ev ev-mas">+${evsFiltrados.length - MAX_CHIPS} más</div>` : '';
+
+    const cell = document.createElement('div');
+    cell.className = `cal-cell${!esEsteMes?' otro-mes':''}${esHoy?' es-hoy':''}`;
+    cell.innerHTML = `
+      <div class="cal-num">
+        <span>${fecha.getDate()}</span>
+        <button class="btn-add-evento" onclick="abrirModal('${key}')" title="Agregar evento">+</button>
+      </div>
+      ${chips}${extra}`;
+    if (evsFiltrados.length > 0) {
+      cell.style.cursor = 'pointer';
+      cell.onclick = (e) => {
+        if (e.target.classList.contains('btn-add-evento')) return;
+        abrirModal(key);
+      };
+    } else {
+      cell.querySelector('.btn-add-evento').onclick = (e) => {
+        e.stopPropagation();
+        abrirModal(key);
+      };
+    }
+    grid.appendChild(cell);
+  }
+}
+
+// ── MODAL DÍA ──
+function abrirModal(key) {
+  diaModalKey = key;
+  const [y,m,d] = key.split('-');
+  const fecha = new Date(+y,+m-1,+d);
+  document.getElementById('modal-dia-titulo').textContent = formatDiaLargo(fecha).replace(/^\w/, c=>c.toUpperCase());
+  document.getElementById('modal-dia-fecha').textContent = '';
+  document.getElementById('modal-inp-texto').value = '';
+
+  const evMap = recolectarEventos();
+  const eventos = evMap[key] || [];
+  const vistos = new Set();
+  const evsFiltrados = eventos.filter(e => {
+    const k = e.tipo+e.texto+(e.id||'');
+    if (vistos.has(k)) return false;
+    vistos.add(k); return true;
+  });
+
+  const lista = document.getElementById('modal-dia-eventos');
+  if (!evsFiltrados.length) {
+    lista.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);padding:0.3rem 0">Sin eventos este día.</div>';
+  } else {
+    lista.innerHTML = evsFiltrados.map(e => `
+      <div class="modal-ev-item">
+        <div class="modal-ev-dot" style="background:${e.dot}"></div>
+        <div class="modal-ev-texto">
+          ${e.link ? `<a href="${e.link}" style="color:var(--text);text-decoration:none;font-weight:500">${e.texto}</a>` : `<span style="font-weight:500">${e.texto}</span>`}
+          ${e.sub ? `<div class="modal-ev-sub">${e.sub}${e.esRango?' · rango de estudio':''}</div>` : ''}
+        </div>
+        ${e.tipo==='manual'&&e.id ? `<button class="modal-ev-del" onclick="borrarManual('${e.id}')">×</button>` : ''}
+      </div>`).join('');
+  }
+
+  document.getElementById('modal-dia').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-inp-texto').focus(), 100);
+}
+
+function cerrarModal() {
+  document.getElementById('modal-dia').classList.remove('open');
+  diaModalKey = null;
+}
+document.getElementById('modal-dia').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-dia')) cerrarModal();
+});
+
+// ── MANUALES ──
+function guardarManual() {
+  const texto = document.getElementById('modal-inp-texto').value.trim();
+  if (!texto || !diaModalKey) return;
+  const manuales = ls('cal_manuales')||[];
+  manuales.push({ id: Date.now().toString(), fecha: diaModalKey, texto });
+  lsSet('cal_manuales', manuales);
+  document.getElementById('modal-inp-texto').value = '';
+  cerrarModal();
+  render();
+}
+
+function borrarManual(id) {
+  const manuales = (ls('cal_manuales')||[]).filter(e=>e.id!==id);
+  lsSet('cal_manuales', manuales);
+  cerrarModal();
+  render();
+}
+
+// ── NAVEGACIÓN ──
+function cambiarMes(delta) {
+  mesActual += delta;
+  if (mesActual > 11) { mesActual = 0; anioActual++; }
+  if (mesActual < 0)  { mesActual = 11; anioActual--; }
+  render();
+}
+function irAHoy() {
+  mesActual = HOY.getMonth();
+  anioActual = HOY.getFullYear();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
