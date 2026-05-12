@@ -58,6 +58,10 @@
   .estado-sel.leido { background:#fef9c3; color:#92400e; border-color:#fbbf24; }
   .estado-sel.estudiado { background:#dbeeff; color:#1d4ed8; border-color:#93c5fd; }
   .estado-sel.aprendido { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
+  .fecha-rango { display:flex; align-items:center; gap:0.18rem; flex-shrink:0; onclick:event.stopPropagation(); }
+  .fecha-inp { width:72px; border:1px solid var(--border); border-radius:5px; padding:0.08rem 0.25rem; font-size:0.6rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; color:var(--text); cursor:pointer; }
+  .fecha-inp:focus { border-color:#93c5fd; background:white; }
+  .fecha-sep { font-size:0.6rem; color:var(--text-muted); flex-shrink:0; }
   .dias-inp { width:40px; border:1px solid var(--border); border-radius:5px; padding:0.1rem 0.3rem; font-size:0.68rem; text-align:center; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; }
   .dias-inp:focus { border-color:#93c5fd; }
   .tema-chev { font-size:0.58rem; color:var(--text-muted); transition:transform 0.18s; flex-shrink:0; }
@@ -82,12 +86,6 @@
 
   /* ADD TEMA */
   .add-row { display:flex; gap:0.4rem; margin-top:0.5rem; }
-  .dias-total-bar { display:flex; align-items:center; justify-content:space-between; padding:0.45rem 0; margin-top:0.5rem; border-top:1px solid var(--border); font-size:0.72rem; color:var(--text-muted); gap:0.5rem; flex-wrap:wrap; }
-  .dias-total-num { font-family:'Montserrat',sans-serif; font-weight:800; font-size:0.88rem; color:var(--text); }
-  .dias-total-cmp { font-size:0.68rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:6px; }
-  .dias-total-ok { background:var(--success-light); color:var(--success); }
-  .dias-total-warn { background:#fef3e2; color:var(--warning); }
-  .dias-total-danger { background:var(--danger-light); color:var(--danger); }
   .add-inp { flex:1; border:1px solid var(--border); border-radius:7px; padding:0.4rem 0.65rem; font-size:0.78rem; font-family:'DM Sans',sans-serif; background:var(--surface); outline:none; }
   .add-inp:focus { border-color:#93c5fd; }
   .btn-add { background:var(--text); color:white; border:none; border-radius:7px; padding:0.4rem 0.9rem; font-size:0.78rem; font-family:'DM Sans',sans-serif; cursor:pointer; }
@@ -315,6 +313,13 @@ function renderPanelIzq(){
           <div onclick="event.stopPropagation();toggleCheckTema(${i})" style="width:14px;height:14px;border-radius:3px;border:2px solid ${marcado?'var(--success)':'var(--border)'};background:${marcado?'var(--success)':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:0.55rem;color:white">${marcado?'✓':''}</div>
           <span class="tema-num">${i+1}</span>
           <span class="tema-nombre" style="${marcado?'text-decoration:line-through;color:var(--text-muted)':''}">${t.nombre}</span>
+          <div class="fecha-rango" onclick="event.stopPropagation()">
+            <input type="date" class="fecha-inp" value="${t.fechaInicio||''}" title="Inicio estudio"
+              onchange="setFechaInicio(${i},this.value)">
+            <span class="fecha-sep">–</span>
+            <input type="date" class="fecha-inp" value="${t.fechaFin||''}" title="Fin estudio"
+              onchange="setFechaFin(${i},this.value)">
+          </div>
           <select class="estado-sel ${esCls}" onchange="setEstado(${i},this)" onclick="event.stopPropagation()">
             <option value="sin-empezar" ${t.estado==='sin-empezar'?'selected':''}>Sin empezar</option>
             <option value="leido" ${t.estado==='leido'?'selected':''}>Leído</option>
@@ -373,19 +378,6 @@ function renderPanelIzq(){
     <div class="sec-title">Temas del programa</div>
     ${items||'<div style="font-size:0.78rem;color:var(--text-muted);padding:0.5rem 0">Sin temas. Agregá los del programa abajo.</div>'}
 
-    ${(()=>{
-      const totalDias = temas.reduce((s,t)=>s+(parseInt(t.dias)||0),0);
-      if(totalDias===0) return '';
-      const dr = dias;
-      let cmpChip = '';
-      if(dr!==null && dr>=0) {
-        if(totalDias<=dr) cmpChip=`<span class="dias-total-cmp dias-total-ok">✓ entran en ${dr}d restantes</span>`;
-        else cmpChip=`<span class="dias-total-cmp dias-total-danger">⚠ faltan ${totalDias-dr}d extra</span>`;
-      } else if(dr!==null && dr<0) {
-        cmpChip=`<span class="dias-total-cmp dias-total-danger">Venció</span>`;
-      }
-      return `<div class="dias-total-bar"><span>📅 Total días estimados: <span class="dias-total-num">${totalDias}d</span></span>${cmpChip}</div>`;
-    })()}
     <div class="add-row" style="margin-top:0.75rem">
       <input class="add-inp" id="inp-tema" placeholder="Agregar tema..." onkeydown="if(event.key==='Enter')agregarTema()">
       <button class="btn-add" onclick="agregarTema()">+ Tema</button>
@@ -441,6 +433,12 @@ function setEstado(i,sel){
 
 function setDias(i,val){
   const l=getUnidades(); l[i].dias=val; setUnidades(l);
+}
+function setFechaInicio(i,val){
+  const l=getUnidades(); l[i].fechaInicio=val; setUnidades(l);
+}
+function setFechaFin(i,val){
+  const l=getUnidades(); l[i].fechaFin=val; setUnidades(l);
 }
 
 function agregarSubtema(i){

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro · Nexu</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f2f1ee; --surface:#fff; --surface2:#f0ede8; --border:#e2ddd6;
+    --text:#1a1714; --text-muted:#8a8077;
+    --med-color:#2563a8; --med-bg:#dbeeff; --med-border:#93c5fd;
+    --nut-color:#9b1c3a; --nut-bg:#fde8ee; --nut-border:#f9a8c0;
+    --danger:#c1440e; --danger-light:#fce8e0;
+    --warning:#b5651d; --warning-light:#fef3e2;
+    --success:#2d6a4f; --success-light:#d8f3dc;
+    --promo:#1d6fa4; --promo-light:#dbeeff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 1.75rem; height:54px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+  .logo { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:800; letter-spacing:-0.02em; }
+  .logo span { color:var(--med-color); }
+  nav { display:flex; gap:0.2rem; }
+  nav a { text-decoration:none; color:var(--text-muted); font-size:0.8rem; font-weight:500; padding:0.38rem 0.75rem; border-radius:7px; transition:all 0.15s; }
+  nav a:hover, nav a.active { background:var(--surface2); color:var(--text); }
+  .date-chip { font-size:0.72rem; color:var(--text-muted); background:var(--surface2); padding:0.28rem 0.7rem; border-radius:20px; border:1px solid var(--border); }
+
+  main { max-width:900px; margin:0 auto; padding:1.5rem; }
+
+  .page-header { margin-bottom:0.35rem; }
+  .page-title { font-family:'Montserrat',sans-serif; font-size:1.35rem; font-weight:800; letter-spacing:-0.03em; }
+  .page-frase { font-size:0.82rem; color:var(--text-muted); font-style:italic; margin-top:0.2rem; margin-bottom:1.5rem; }
+
+  /* SECCIÓN */
+  .reg-section { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:1.25rem; }
+  .reg-section-header { padding:0.8rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.6rem; }
+  .reg-section-title { font-family:'Montserrat',sans-serif; font-size:0.88rem; font-weight:700; flex:1; }
+  .reg-count { font-size:0.72rem; color:var(--text-muted); background:var(--surface2); padding:0.15rem 0.55rem; border-radius:20px; border:1px solid var(--border); }
+
+  /* ITEM */
+  .reg-item { display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:0.75rem; padding:0.65rem 1.25rem; border-bottom:1px solid var(--surface2); transition:background 0.13s; }
+  .reg-item:last-child { border-bottom:none; }
+  .reg-item:hover { background:var(--surface2); }
+
+  .reg-badge { width:38px; height:38px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex-shrink:0; }
+  .badge-hoy     { background:#dbeeff; }
+  .badge-esta-sem { background:var(--warning-light); }
+  .badge-viene   { background:var(--surface2); }
+
+  .reg-info { min-width:0; }
+  .reg-nombre { font-weight:600; font-size:0.83rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .reg-meta { font-size:0.68rem; color:var(--text-muted); margin-top:0.15rem; display:flex; gap:0.45rem; flex-wrap:wrap; align-items:center; }
+
+  .carrera-chip { font-size:0.6rem; font-weight:700; padding:0.13rem 0.42rem; border-radius:6px; text-transform:uppercase; letter-spacing:0.03em; flex-shrink:0; }
+  .chip-medicina { background:var(--med-bg); color:var(--med-color); }
+  .chip-nutricion { background:var(--nut-bg); color:var(--nut-color); }
+
+  .estado-chip { font-size:0.6rem; font-weight:700; padding:0.1rem 0.38rem; border-radius:5px; text-transform:uppercase; letter-spacing:0.03em; }
+  .ec-sin-empezar { background:var(--surface2); color:var(--text-muted); }
+  .ec-leido       { background:#fef9c3; color:#92400e; }
+  .ec-estudiado   { background:var(--med-bg); color:var(--med-color); }
+
+  .rango-chip { font-size:0.65rem; font-weight:600; padding:0.15rem 0.48rem; border-radius:6px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
+  .rango-hoy      { background:#dbeeff; border-color:var(--med-border); color:var(--med-color); }
+  .rango-esta-sem { background:var(--warning-light); border-color:#fbbf24; color:var(--warning); }
+  .rango-viene    { background:var(--surface2); color:var(--text-muted); }
+
+  .dias-final-chip { font-size:0.68rem; font-weight:700; padding:0.18rem 0.5rem; border-radius:7px; white-space:nowrap; flex-shrink:0; }
+  .dfc-urgente { background:var(--danger-light); color:var(--danger); }
+  .dfc-pronto  { background:var(--warning-light); color:var(--warning); }
+  .dfc-ok      { background:var(--success-light); color:var(--success); }
+  .dfc-sf      { background:var(--surface2); color:var(--text-muted); }
+
+  .btn-ir { font-family:'DM Sans',sans-serif; font-size:0.68rem; font-weight:500; padding:0.25rem 0.6rem; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; text-decoration:none; white-space:nowrap; transition:all 0.13s; flex-shrink:0; }
+  .btn-ir:hover { background:var(--text); color:white; border-color:var(--text); }
+
+  .reg-empty { padding:1.5rem; text-align:center; color:var(--text-muted); font-size:0.8rem; line-height:1.7; }
+  .reg-empty strong { color:var(--text); }
+
+  .hint-box { background:var(--surface2); border:1px dashed var(--border); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.25rem; font-size:0.78rem; color:var(--text-muted); line-height:1.7; }
+  .hint-box strong { color:var(--text); }
+
+  @media(max-width:600px) {
+    main { padding:0.85rem; }
+    header { padding:0 0.85rem; }
+    .reg-item { grid-template-columns:auto 1fr auto; gap:0.5rem; padding:0.55rem 0.85rem; }
+    .dias-final-chip { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:0.75rem">
+    <div class="logo">Ne<span>xu</span></div>
+    <div class="date-chip" id="fecha-hoy"></div>
+  </div>
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="plan.html">Plan</a>
+    <a href="registro.html" class="active">Registro</a>
+  </nav>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1 class="page-title">🔥 Mantén el ritmo</h1>
+    <div class="page-frase" id="frase-registro"></div>
+  </div>
+
+  <div class="hint-box" id="hint-box">
+    <strong>¿Cómo funciona?</strong> Entrá al temario de cada final, asignale a cada tema una fecha de inicio y fin de estudio. Acá vas a ver automáticamente qué temas tenés que ver <strong>esta semana</strong> y cuáles se vienen <strong>en los próximos 14 días</strong>.
+  </div>
+
+  <!-- SECCIÓN 1: HOY Y ESTA SEMANA -->
+  <div class="reg-section" id="sec-ahora">
+    <div class="reg-section-header">
+      <span style="font-size:1.1rem">📌</span>
+      <div class="reg-section-title">Para ver ahora</div>
+      <span class="reg-count" id="count-ahora">0</span>
+    </div>
+    <div id="lista-ahora"></div>
+  </div>
+
+  <!-- SECCIÓN 2: LO QUE VIENE -->
+  <div class="reg-section" id="sec-viene">
+    <div class="reg-section-header">
+      <span style="font-size:1.1rem">🗓️</span>
+      <div class="reg-section-title">Lo que viene <span style="font-weight:400;color:var(--text-muted);font-size:0.78rem">(próximos 14 días)</span></div>
+      <span class="reg-count" id="count-viene">0</span>
+    </div>
+    <div id="lista-viene"></div>
+  </div>
+</main>
+
+<script>
+// ── UTILS ──
+function ls(k) { try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;} }
+function hoy() { const d=new Date(); d.setHours(0,0,0,0); return d; }
+function parseDate(str) {
+  if(!str) return null;
+  // Soporta tanto YYYY-MM-DD (input date) como DD/MM/YYYY
+  if(str.includes('-')) { const [y,m,d]=str.split('-'); return new Date(+y,+m-1,+d); }
+  const [d,m,y]=str.split('/'); return new Date(+y,+m-1,+d);
+}
+function formatFecha(str) {
+  if(!str) return '';
+  const d = parseDate(str);
+  if(!d) return str;
+  return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+}
+function diasEntre(d1, d2) { return Math.round((d2-d1)/86400000); }
+
+// ── DATOS ──
+function getFinales() { return ls('finales')||[]; }
+function getTemas(planId) { return ls('final_unidades_'+planId)||[]; }
+
+// ── FRASE ROTATIVA ──
+const FRASES = [
+  '"Un 1% cada día."',
+  '"Constancia > intensidad."',
+  '"Cinco minutos cuentan."',
+  '"No rompas la racha."',
+  '"Pequeño esfuerzo, gran diferencia."',
+  '"Hoy es mejor que mañana."',
+  '"Repasar es recordar."',
+  '"El esfuerzo de hoy es el resultado de mañana."',
+];
+
+// ── FECHA HOY ──
+const HOY = hoy();
+const fechaLabel = HOY.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('fecha-hoy').textContent = fechaLabel.charAt(0).toUpperCase()+fechaLabel.slice(1);
+const doy = Math.floor((Date.now()-new Date(HOY.getFullYear(),0,0))/86400000);
+document.getElementById('frase-registro').textContent = FRASES[doy%FRASES.length];
+
+// ── RENDER ──
+function render() {
+  const finales = getFinales();
+  const ahora = [];   // inicio ≤ hoy ≤ fin  (o fin dentro de 7 días desde hoy)
+  const viene = [];   // inicio entre mañana y +14 días
+
+  finales.forEach(f => {
+    const temas = getTemas(f.planId);
+    const drFinal = f.fecha ? diasEntre(HOY, parseDate(f.fecha)) : null;
+
+    temas.forEach((t, ti) => {
+      if (!t.fechaInicio && !t.fechaFin) return;
+      if (t.estado === 'aprendido') return;
+
+      const inicio = t.fechaInicio ? parseDate(t.fechaInicio) : null;
+      const fin    = t.fechaFin    ? parseDate(t.fechaFin)    : null;
+
+      const diasAlInicio = inicio ? diasEntre(HOY, inicio) : null;
+      const diasAlFin    = fin    ? diasEntre(HOY, fin)    : null;
+
+      // AHORA: ya arrancó (inicio ≤ hoy) y todavía no terminó (fin ≥ hoy), o vence en ≤7 días
+      if (
+        (inicio && fin && inicio <= HOY && fin >= HOY) ||
+        (fin && !inicio && diasAlFin !== null && diasAlFin >= 0 && diasAlFin <= 7) ||
+        (inicio && !fin && inicio <= HOY)
+      ) {
+        ahora.push({ f, t, ti, drFinal, diasAlFin, diasAlInicio });
+        return;
+      }
+
+      // VIENE: arranca en 1–14 días
+      if (diasAlInicio !== null && diasAlInicio > 0 && diasAlInicio <= 14) {
+        viene.push({ f, t, ti, drFinal, diasAlFin, diasAlInicio });
+      }
+    });
+  });
+
+  // Ordenar: por días al fin (más urgente primero)
+  const sort = (a,b) => (a.diasAlFin??999) - (b.diasAlFin??999);
+  ahora.sort(sort);
+  viene.sort((a,b)=>(a.diasAlInicio??999)-(b.diasAlInicio??999));
+
+  renderLista('lista-ahora', 'count-ahora', 'sec-ahora', ahora, 'ahora');
+  renderLista('lista-viene', 'count-viene', 'sec-viene', viene, 'viene');
+
+  // Ocultar hint si ya hay temas cargados
+  const total = ahora.length + viene.length;
+  if (total > 0) document.getElementById('hint-box').style.display = 'none';
+}
+
+function renderLista(listaId, countId, secId, items, tipo) {
+  const lista = document.getElementById(listaId);
+  const count = document.getElementById(countId);
+  const sec   = document.getElementById(secId);
+  if (!lista) return;
+
+  count.textContent = items.length;
+
+  if (!items.length) {
+    const msgs = {
+      ahora: 'No hay temas programados para esta semana.<br>Asigná fechas en el temario de cada final.',
+      viene: 'No hay temas programados para los próximos 14 días.',
+    };
+    lista.innerHTML = `<div class="reg-empty">${msgs[tipo]}</div>`;
+    return;
+  }
+
+  const estadoCls   = { 'sin-empezar':'ec-sin-empezar', 'leido':'ec-leido', 'estudiado':'ec-estudiado' };
+  const estadoLabel = { 'sin-empezar':'Sin empezar', 'leido':'Leído', 'estudiado':'Estudiado' };
+  const badgeCls    = { ahora:'badge-hoy', viene:'badge-viene' };
+  const badgeIcon   = { ahora:'📌', viene:'🗓️' };
+
+  lista.innerHTML = items.map(({ f, t, ti, drFinal, diasAlFin, diasAlInicio }) => {
+    const chipCls = f.carrera==='Medicina'?'chip-medicina':'chip-nutricion';
+    const estado  = t.estado||'sin-empezar';
+
+    // Chip días al final del examen
+    const dfcCls = drFinal===null?'dfc-sf': drFinal<0?'dfc-urgente': drFinal<=15?'dfc-urgente': drFinal<=30?'dfc-pronto':'dfc-ok';
+    const dfcLabel = drFinal===null?'Sin fecha final': drFinal<0?'Final vencido':`Final en ${drFinal}d`;
+
+    // Rango legible
+    const rangoText = [t.fechaInicio,t.fechaFin].filter(Boolean).map(formatFecha).join(' – ');
+    const rangoCls = tipo==='ahora'
+      ? (diasAlFin!==null && diasAlFin<=2 ? 'rango-hoy' : 'rango-esta-sem')
+      : 'rango-viene';
+
+    // Días restantes del rango
+    let rangoInfo = '';
+    if (tipo==='ahora' && diasAlFin!==null) {
+      rangoInfo = diasAlFin===0?'· vence hoy': diasAlFin===1?'· vence mañana':`· ${diasAlFin}d restantes`;
+    } else if (tipo==='viene' && diasAlInicio!==null) {
+      rangoInfo = diasAlInicio===1?'· empieza mañana':`· empieza en ${diasAlInicio}d`;
+    }
+
+    return `
+      <div class="reg-item">
+        <div class="reg-badge ${badgeCls[tipo]}">${badgeIcon[tipo]}</div>
+        <div class="reg-info">
+          <div class="reg-nombre">${t.nombre}</div>
+          <div class="reg-meta">
+            <span class="carrera-chip ${chipCls}">${f.nombre}</span>
+            <span class="estado-chip ${estadoCls[estado]}">${estadoLabel[estado]||estado}</span>
+            <span class="rango-chip ${rangoCls}">${rangoText} ${rangoInfo}</span>
+          </div>
+        </div>
+        <span class="dias-final-chip ${dfcCls}">${dfcLabel}</span>
+        <a class="btn-ir" href="final.html?id=${f.planId}">Ver →</a>
+      </div>`;
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>
