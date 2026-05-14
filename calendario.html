@@ -357,19 +357,17 @@ function render(){
     numDiv.innerHTML=`<span>${fecha.getDate()}</span><button class="btn-add-evento" onclick="event.stopPropagation();abrirModal('${key}')" title="+">+</button>`;
     cell.appendChild(numDiv);
 
-    // Franjas: solo mostrar chip en día de inicio y día de fin
+    // Franjas: mostrar en todos los días del rango
     let nFranjas=0;
     franjasHoy.forEach(fr=>{
+      if(nFranjas>=3)return;
+      nFranjas++;
       const esInicio=toKey(fr.desde)===key;
       const esFin=toKey(fr.hasta)===key;
       const esUnico=esInicio&&esFin;
-      // Solo renderizar si es el día de inicio o el día de fin (no los del medio)
-      if(!esInicio&&!esFin)return;
-      if(nFranjas>=2)return;
-      nFranjas++;
-
       const checked=getCheck(fr.rangoId,key);
-      const label=esUnico?fr.texto:esInicio?`○ ${fr.texto}`:`⚑ ${fr.texto}`;
+      // Mostrar nombre solo en inicio y fin, punto en días del medio
+      const label=esUnico||esInicio||esFin ? fr.texto : fr.texto;
 
       const div=document.createElement('div');
       div.className=`ev ${fr.clsColor.replace('franja-','ev-')}${checked?' chequeado':''}`;
@@ -395,9 +393,7 @@ function render(){
       cell.appendChild(div);
     });
 
-    // Solo contar franjas visibles (inicio o fin del rango)
-    const franjasVisibles=franjasHoy.filter(fr=>toKey(fr.desde)===key||toKey(fr.hasta)===key);
-    const totalReal=franjasVisibles.length+puntuales.length;
+    const totalReal=franjasHoy.length+puntuales.length;
     const totalVis=nFranjas+nP;
     if(totalReal>totalVis){
       const mas=document.createElement('div');
