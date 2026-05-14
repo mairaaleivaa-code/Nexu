@@ -60,6 +60,9 @@
   .ev-parcial { background:#fce8e0; color:#c1440e; border-left:2px solid #c1440e; }
   .ev-final   { background:var(--success-light); color:var(--success); border-left:2px solid var(--success); }
   .ev-manual  { background:var(--warning-light); color:var(--warning); border-left:2px solid var(--warning); }
+  .ev-mesa     { background:#ede9fe; color:#5b21b6; border-left:2px solid #5b21b6; }
+  .ev-tema     { background:#dbeeff; color:#1d4ed8; border-left:2px solid #1d4ed8; }
+  .ev-tema-nut { background:#fde8ee; color:#9b1c3a; border-left:2px solid #9b1c3a; }
   .ev-mas     { background:var(--surface2); color:var(--text-muted); border-left:2px solid var(--border); font-style:italic; cursor:default; }
 
   /* FRANJAS DE RANGO */
@@ -354,29 +357,24 @@ function render(){
     numDiv.innerHTML=`<span>${fecha.getDate()}</span><button class="btn-add-evento" onclick="event.stopPropagation();abrirModal('${key}')" title="+">+</button>`;
     cell.appendChild(numDiv);
 
-    // Franjas (máx 2)
+    // Franjas: solo mostrar chip en día de inicio y día de fin
     let nFranjas=0;
     franjasHoy.forEach(fr=>{
-      if(nFranjas>=2)return;
-      nFranjas++;
       const esInicio=toKey(fr.desde)===key;
       const esFin=toKey(fr.hasta)===key;
       const esUnico=esInicio&&esFin;
-      // Posición visual en la fila
-      let pos='medio';
-      if(esUnico) pos='unico';
-      else if(esInicio||dow===1) pos='inicio'; // inicio real o inicio de fila (lunes)
-      else if(esFin||dow===0)   pos='fin';     // fin real o fin de fila (domingo)
+      // Solo renderizar si es el día de inicio o el día de fin (no los del medio)
+      if(!esInicio&&!esFin)return;
+      if(nFranjas>=2)return;
+      nFranjas++;
 
       const checked=getCheck(fr.rangoId,key);
-      // Solo mostrar texto en el primer día visible del rango en esta semana
-      const mostrarTexto=(esInicio||dow===1||dow===0&&!esInicio&&toKey(fr.desde)===key);
-      const textoVisible=(esInicio||(dow===1))?fr.texto:'';
+      const label=esUnico?fr.texto:esInicio?`▶ ${fr.texto}`:`■ ${fr.texto}`;
 
       const div=document.createElement('div');
-      div.className=`ev-franja ${fr.clsColor} ${pos}${checked?' chequeado':''}`;
+      div.className=`ev ${fr.clsColor.replace('franja-','ev-')}${checked?' chequeado':''}`;
       div.title=fr.texto;
-      div.textContent=textoVisible;
+      div.textContent=label;
       div.onclick=(e)=>{e.stopPropagation();abrirModal(key);};
       cell.appendChild(div);
     });
