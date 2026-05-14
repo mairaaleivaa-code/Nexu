@@ -369,7 +369,7 @@ function render(){
       nFranjas++;
 
       const checked=getCheck(fr.rangoId,key);
-      const label=esUnico?fr.texto:esInicio?`▶ ${fr.texto}`:`■ ${fr.texto}`;
+      const label=esUnico?fr.texto:esInicio?`● ${fr.texto}`:`◎ fin`;
 
       const div=document.createElement('div');
       div.className=`ev ${fr.clsColor.replace('franja-','ev-')}${checked?' chequeado':''}`;
@@ -395,7 +395,9 @@ function render(){
       cell.appendChild(div);
     });
 
-    const totalReal=franjasHoy.length+puntuales.length;
+    // Solo contar franjas visibles (inicio o fin del rango)
+    const franjasVisibles=franjasHoy.filter(fr=>toKey(fr.desde)===key||toKey(fr.hasta)===key);
+    const totalReal=franjasVisibles.length+puntuales.length;
     const totalVis=nFranjas+nP;
     if(totalReal>totalVis){
       const mas=document.createElement('div');
