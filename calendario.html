@@ -369,7 +369,9 @@ function render(){
       nFranjas++;
 
       const checked=getCheck(fr.rangoId,key);
-      const label=esUnico?fr.texto:esInicio?`● ${fr.texto}`:`● ${fr.texto}`;
+      // Solo mostrar en inicio, nada en fin
+      if(!esInicio&&!esUnico)return;
+      const label=fr.texto;
 
       const div=document.createElement('div');
       div.className=`ev ${fr.clsColor.replace('franja-','ev-')}${checked?' chequeado':''}`;
