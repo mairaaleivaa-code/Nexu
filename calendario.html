@@ -64,11 +64,11 @@
 
   /* FRANJAS DE RANGO */
   .ev-franja {
-    font-size:0.6rem; font-weight:600; line-height:1.5;
+    font-size:0.6rem; font-weight:600; line-height:1;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     cursor:pointer; margin-bottom:0.18rem;
-    padding:0.1rem 0.4rem;
-    /* Tramo medio: sin bordes redondeados, sangra hasta el borde */
+    min-height:14px;
+    padding:0.22rem 0.4rem;
     border-radius:0;
     margin-left:-0.5rem;
     margin-right:-0.5rem;
@@ -128,9 +128,9 @@
     main { padding:0.75rem 0.5rem 3rem; }
     header { padding:0 0.85rem; }
     .cal-cell { min-height:72px; padding:0.28rem 0.25rem 0.35rem; }
-    .ev, .ev-franja { font-size:0.52rem; line-height:1.45; }
+    .ev, .ev-franja { font-size:0.52rem; line-height:1; min-height:12px; }
     .ev { padding:0.06rem 0.25rem; }
-    .ev-franja { padding-left:0.4rem; margin-left:-0.25rem; margin-right:-0.25rem; }
+    .ev-franja { padding:0.18rem 0.25rem; padding-left:0.4rem; margin-left:-0.25rem; margin-right:-0.25rem; }
     .ev-franja.inicio { margin-left:0.1rem; }
     .ev-franja.fin { margin-right:0.1rem; }
     .ev-franja.unico { margin-left:0.1rem; margin-right:0.1rem; }
@@ -189,6 +189,16 @@
     <div class="modal-add-title">Agregar evento manual</div>
     <input class="modal-inp" id="modal-inp-texto" placeholder="Ej: Repaso con compañera, Feriado..."
       onkeydown="if(event.key==='Enter')guardarManual()">
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.45rem">
+      <div style="flex:1">
+        <div style="font-size:0.65rem;color:var(--text-muted);margin-bottom:0.2rem">Fecha inicio</div>
+        <input type="date" class="modal-inp" id="modal-inp-inicio" style="margin-bottom:0">
+      </div>
+      <div style="flex:1">
+        <div style="font-size:0.65rem;color:var(--text-muted);margin-bottom:0.2rem">Fecha fin <span style="opacity:0.5">(opcional)</span></div>
+        <input type="date" class="modal-inp" id="modal-inp-fin" style="margin-bottom:0">
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cerrar</button>
       <button class="btn-save" onclick="guardarManual()">+ Agregar</button>
@@ -416,6 +426,8 @@ function abrirModal(key){
   const fecha=new Date(+y,+m-1,+d);
   document.getElementById('modal-dia-titulo').textContent=fmtLarga(fecha).replace(/^\w/,c=>c.toUpperCase());
   document.getElementById('modal-inp-texto').value='';
+  document.getElementById('modal-inp-inicio').value=key;
+  document.getElementById('modal-inp-fin').value='';
 
   const{evMap,franjas}=recolectarEventos();
   const puntuales=evMap[key]||[];
@@ -468,10 +480,13 @@ document.getElementById('modal-dia').addEventListener('click',e=>{
 function guardarManual(){
   const texto=document.getElementById('modal-inp-texto').value.trim();
   if(!texto||!diaModalKey)return;
+  const fechaInicio=document.getElementById('modal-inp-inicio').value||diaModalKey;
+  const fechaFin=document.getElementById('modal-inp-fin').value||fechaInicio;
   const manuales=ls('cal_manuales')||[];
-  manuales.push({id:Date.now().toString(),fecha:diaModalKey,texto});
+  manuales.push({id:Date.now().toString(),fecha:fechaInicio,fechaHasta:fechaFin,texto});
   lsSet('cal_manuales',manuales);
   document.getElementById('modal-inp-texto').value='';
+  document.getElementById('modal-inp-fin').value='';
   cerrarModal();
   render();
 }
