@@ -220,6 +220,27 @@
   .btn-add-nota { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:0.26rem 0.55rem; font-size:0.72rem; cursor:pointer; color:var(--text-muted); white-space:nowrap; }
   .btn-add-nota:hover { background:var(--surface2); }
 
+  /* ── BARRA PARCIALES ── */
+  .parciales-barra { margin-bottom:1.1rem; }
+  .parciales-barra-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.5rem; }
+  .parciales-scroll { display:flex; gap:0.4rem; align-items:center; overflow-x:auto; padding-bottom:0.3rem; scrollbar-width:none; }
+  .parciales-scroll::-webkit-scrollbar { display:none; }
+  .parc-chip { display:flex; flex-direction:column; gap:0.1rem; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:0.45rem 0.7rem; flex-shrink:0; min-width:110px; transition:box-shadow 0.13s; cursor:default; }
+  .parc-chip:hover { box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+  .parc-chip.urgente { border-color:#fca5a5; background:#fff5f5; }
+  .parc-chip.pronto  { border-color:#fcd34d; background:#fffbeb; }
+  .parc-chip.ok      { border-color:var(--border); }
+  .parc-nombre { font-size:0.7rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+  .parc-materia { font-size:0.6rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .parc-fecha-row { display:flex; align-items:center; gap:0.3rem; margin-top:0.1rem; }
+  .parc-fecha { font-size:0.62rem; color:var(--text-muted); }
+  .parc-dias { font-size:0.65rem; font-weight:700; padding:0.1rem 0.35rem; border-radius:5px; }
+  .parc-dias.urgente { background:var(--danger-light); color:var(--danger); }
+  .parc-dias.pronto  { background:var(--warning-light); color:var(--warning); }
+  .parc-dias.ok      { background:var(--success-light); color:var(--success); }
+  .parc-sep { font-size:0.75rem; color:#fbbf24; flex-shrink:0; font-weight:700; align-self:center; }
+  .parc-empty { font-size:0.75rem; color:var(--text-muted); font-style:italic; padding:0.3rem 0; }
+
   @media(max-width:1024px) { .materias-grid { grid-template-columns:repeat(2,1fr); } }
   @media(max-width:600px) {
     .materias-grid { grid-template-columns:1fr; }
@@ -282,6 +303,9 @@
     <h1 class="page-title">Hola, Maira 👋</h1>
     <span class="page-subtitle">1er cuatrimestre 2026 · 1 abr → 17 jul</span>
   </div>
+
+  <!-- ── BARRA PARCIALES ── -->
+  <div class="parciales-barra" id="parciales-barra"></div>
 
   <div class="materias-grid" id="materias-grid"></div>
 
@@ -1392,6 +1416,53 @@ function importarDatos(input){
 renderMaterias();
 renderFinales();
 renderMesas();
+renderParciales();
+
+// ── BARRA DE PARCIALES ──
+function renderParciales() {
+  const container = document.getElementById('parciales-barra');
+  if (!container) return;
+
+  const todasMaterias = [...(MATERIAS||[]), ...(getCustom()||[])];
+  const lista = [];
+
+  todasMaterias.forEach(m => {
+    const parcsBase = m.parciales || [];
+    const parcsExtra = getParcialesExtra(m.id) || [];
+    [...parcsBase, ...parcsExtra].forEach(p => {
+      if (!p.fecha) return;
+      const dr = diasRestantes(p.fecha);
+      if (dr === null || dr < 0) return;
+      lista.push({ nombre: p.nombre, materia: m.nombre, carrera: m.carrera, fecha: p.fecha, dr });
+    });
+  });
+
+  lista.sort((a, b) => a.dr - b.dr);
+
+  if (!lista.length) { container.innerHTML = ''; return; }
+
+  const chipCls = (dr) => dr <= 7 ? 'urgente' : dr <= 21 ? 'pronto' : 'ok';
+  const diasLabel = (dr) => dr === 0 ? 'hoy' : dr === 1 ? 'mañana' : `en ${dr}d`;
+
+  let html = '<div class="parciales-barra-label">📅 Próximos parciales</div><div class="parciales-scroll">';
+
+  lista.forEach((p, i) => {
+    const cls = chipCls(p.dr);
+    const sep = i < lista.length - 1 && (lista[i+1].dr - p.dr) <= 7
+      ? '<div class="parc-sep" title="Parciales muy cercanos">⚡</div>' : '';
+    html += `
+      <div class="parc-chip ${cls}">
+        <div class="parc-nombre" title="${p.nombre} · ${p.materia}">${p.nombre} · ${p.materia}</div>
+        <div class="parc-fecha-row">
+          <span class="parc-fecha">${p.fecha}</span>
+          <span class="parc-dias ${cls}">${diasLabel(p.dr)}</span>
+        </div>
+      </div>${sep}`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
 </script>
 </body>
 </html>
