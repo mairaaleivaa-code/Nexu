@@ -58,10 +58,34 @@
   .estado-sel.leido { background:#fef9c3; color:#92400e; border-color:#fbbf24; }
   .estado-sel.estudiado { background:#dbeeff; color:#1d4ed8; border-color:#93c5fd; }
   .estado-sel.aprendido { background:var(--success-light); color:var(--success); border-color:#6ee7b7; }
-  .fecha-rango { display:flex; align-items:center; gap:0.18rem; flex-shrink:0; }
-  .fecha-inp { width:72px; border:1px solid var(--border); border-radius:5px; padding:0.08rem 0.25rem; font-size:0.6rem; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; color:var(--text); cursor:pointer; }
-  .fecha-inp:focus { border-color:#93c5fd; background:white; }
-  .fecha-sep { font-size:0.6rem; color:var(--text-muted); flex-shrink:0; }
+  .btn-cal-mini { font-family:'DM Sans',sans-serif; font-size:0.62rem; font-weight:500; padding:0.18rem 0.5rem; border-radius:6px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all 0.13s; }
+  .btn-cal-mini:hover { border-color:var(--med-border); color:var(--med-color); background:var(--med-bg); }
+  .btn-cal-mini.tiene-fecha { border-color:var(--med-border); color:var(--med-color); background:var(--med-bg); }
+
+  /* POPUP MINI CALENDARIO */
+  .cal-mini-overlay { display:none; position:fixed; inset:0; z-index:500; }
+  .cal-mini-overlay.open { display:block; }
+  .cal-mini-popup { position:fixed; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1rem; box-shadow:0 8px 32px rgba(0,0,0,0.18); z-index:501; width:280px; }
+  .cal-mini-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.65rem; }
+  .cal-mini-titulo { font-family:'Montserrat',sans-serif; font-size:0.85rem; font-weight:700; }
+  .cal-mini-nav { background:none; border:none; cursor:pointer; font-size:0.85rem; color:var(--text-muted); padding:0.2rem 0.4rem; border-radius:5px; }
+  .cal-mini-nav:hover { background:var(--surface2); }
+  .cal-mini-dias-head { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:3px; }
+  .cal-mini-dh { text-align:center; font-size:0.55rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; padding:2px 0; }
+  .cal-mini-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-mini-dia { text-align:center; font-size:0.7rem; padding:0.3rem 0; border-radius:5px; cursor:pointer; color:var(--text); transition:all 0.1s; user-select:none; }
+  .cal-mini-dia:hover { background:var(--surface2); }
+  .cal-mini-dia.otro-mes { color:var(--border); cursor:default; }
+  .cal-mini-dia.otro-mes:hover { background:transparent; }
+  .cal-mini-dia.hoy { font-weight:800; color:var(--med-color); }
+  .cal-mini-dia.en-rango { background:var(--med-bg); color:var(--med-color); border-radius:0; }
+  .cal-mini-dia.inicio-rango { background:var(--med-color); color:white; border-radius:5px 0 0 5px; }
+  .cal-mini-dia.fin-rango { background:var(--med-color); color:white; border-radius:0 5px 5px 0; }
+  .cal-mini-dia.unico-rango { background:var(--med-color); color:white; border-radius:5px; }
+  .cal-mini-hint { font-size:0.62rem; color:var(--text-muted); text-align:center; margin-top:0.6rem; }
+  .cal-mini-acciones { display:flex; gap:0.4rem; margin-top:0.75rem; justify-content:flex-end; }
+  .btn-cm-ok { padding:0.3rem 0.8rem; border-radius:7px; border:none; background:var(--med-color); color:white; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; cursor:pointer; }
+  .btn-cm-clear { padding:0.3rem 0.7rem; border-radius:7px; border:1px solid var(--border); background:var(--surface); font-family:'DM Sans',sans-serif; font-size:0.75rem; cursor:pointer; color:var(--text-muted); }
   .dias-inp { width:40px; border:1px solid var(--border); border-radius:5px; padding:0.1rem 0.3rem; font-size:0.68rem; text-align:center; font-family:'DM Sans',sans-serif; background:var(--surface2); outline:none; }
   .dias-inp:focus { border-color:#93c5fd; }
   .tema-chev { font-size:0.58rem; color:var(--text-muted); transition:transform 0.18s; flex-shrink:0; }
@@ -150,7 +174,11 @@
 <body>
 <header>
   <a href="index.html" class="logo" style="text-decoration:none;color:var(--text)">Ne<span>xu</span></a>
-  <nav><a href="index.html">← Inicio</a>    <a href="registro.html">Registro</a>
+  <nav>
+    <a href="calendario.html">Calendario</a>
+    <a href="index.html">Inicio</a>
+    <a href="plan.html">Plan</a>
+    <a href="registro.html">Registro</a>
   </nav>
 </header>
 
@@ -326,13 +354,13 @@ function renderPanelIzq(){
           <div onclick="event.stopPropagation();toggleCheckTema(${i})" style="width:14px;height:14px;border-radius:3px;border:2px solid ${marcado?'var(--success)':'var(--border)'};background:${marcado?'var(--success)':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:0.55rem;color:white">${marcado?'✓':''}</div>
           <span class="tema-num">${i+1}</span>
           <span class="tema-nombre" style="${marcado?'text-decoration:line-through;color:var(--text-muted)':''}">${t.nombre}</span>
-          <div class="fecha-rango" onclick="event.stopPropagation()">
-            <input type="date" class="fecha-inp" value="${t.fechaInicio||''}" title="Inicio estudio"
-              onchange="setFechaInicio(${i},this.value)">
-            <span class="fecha-sep">–</span>
-            <input type="date" class="fecha-inp" value="${t.fechaFin||''}" title="Fin estudio"
-              onchange="setFechaFin(${i},this.value)">
-          </div>
+          <button class="btn-cal-mini" onclick="event.stopPropagation();abrirCalMini(${i})" title="Asignar fechas de estudio">
+            ${t.fechaInicio&&t.fechaFin
+              ? `📅 ${t.fechaInicio.split('-').slice(1).map(Number).join('/')} – ${t.fechaFin.split('-').slice(1).map(Number).join('/')}`
+              : t.fechaInicio
+                ? `📅 ${t.fechaInicio.split('-').slice(1).map(Number).join('/')}`
+                : '📅 Fechas'}
+          </button>
           <select class="estado-sel ${esCls}" onchange="setEstado(${i},this)" onclick="event.stopPropagation()">
             <option value="sin-empezar" ${t.estado==='sin-empezar'?'selected':''}>Sin empezar</option>
             <option value="leido" ${t.estado==='leido'?'selected':''}>Leído</option>
@@ -510,6 +538,141 @@ function setFechaFin(i,val){
   const l=getUnidades(); l[i].fechaFin=val; setUnidades(l);
 }
 
+// ── MINI CALENDARIO POPUP ──
+let _cmIdx=null, _cmMes=null, _cmAnio=null;
+let _cmInicio=null, _cmFin=null, _cmSeleccionando=false;
+
+function toKeyMini(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function abrirCalMini(idx) {
+  _cmIdx = idx;
+  const l = getUnidades();
+  const t = l[idx];
+  // Cargar fechas existentes
+  _cmInicio = t.fechaInicio ? new Date(t.fechaInicio+'T00:00:00') : null;
+  _cmFin    = t.fechaFin    ? new Date(t.fechaFin+'T00:00:00')    : null;
+  _cmSeleccionando = false;
+
+  const hoy = new Date();
+  _cmMes  = _cmInicio ? _cmInicio.getMonth() : hoy.getMonth();
+  _cmAnio = _cmInicio ? _cmInicio.getFullYear() : hoy.getFullYear();
+
+  // Posicionar popup cerca del botón
+  const overlay = document.getElementById('cal-mini-overlay');
+  const popup   = document.getElementById('cal-mini-popup');
+  overlay.classList.add('open');
+  popup.style.display = 'block';
+
+  // Centrar popup en pantalla
+  popup.style.top  = '50%';
+  popup.style.left = '50%';
+  popup.style.transform = 'translate(-50%,-50%)';
+
+  renderCalMini();
+}
+
+function cerrarCalMini() {
+  document.getElementById('cal-mini-overlay').classList.remove('open');
+  document.getElementById('cal-mini-popup').style.display = 'none';
+  _cmIdx = null; _cmInicio = null; _cmFin = null; _cmSeleccionando = false;
+}
+
+function navCalMini(delta) {
+  _cmMes += delta;
+  if (_cmMes > 11) { _cmMes = 0; _cmAnio++; }
+  if (_cmMes < 0)  { _cmMes = 11; _cmAnio--; }
+  renderCalMini();
+}
+
+function renderCalMini() {
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-mini-titulo').textContent = `${MESES[_cmMes]} ${_cmAnio}`;
+
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const primerDia = new Date(_cmAnio, _cmMes, 1);
+  let startDow = primerDia.getDay();
+  startDow = startDow === 0 ? 6 : startDow - 1;
+  const diasEnMes = new Date(_cmAnio, _cmMes+1, 0).getDate();
+  const totalCeldas = Math.ceil((startDow + diasEnMes) / 7) * 7;
+
+  const grid = document.getElementById('cal-mini-grid');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < totalCeldas; i++) {
+    const offset = i - startDow + 1;
+    const fecha  = new Date(_cmAnio, _cmMes, offset);
+    const esEsteMes = fecha.getMonth() === _cmMes;
+    const key = toKeyMini(fecha);
+    const esHoy = toKeyMini(fecha) === toKeyMini(hoy);
+
+    let cls = 'cal-mini-dia';
+    if (!esEsteMes) cls += ' otro-mes';
+    if (esHoy) cls += ' hoy';
+
+    if (_cmInicio && _cmFin && esEsteMes) {
+      const ini = toKeyMini(_cmInicio), fin = toKeyMini(_cmFin);
+      if (key === ini && key === fin) cls += ' unico-rango';
+      else if (key === ini) cls += ' inicio-rango';
+      else if (key === fin) cls += ' fin-rango';
+      else if (key > ini && key < fin) cls += ' en-rango';
+    } else if (_cmInicio && !_cmFin && esEsteMes) {
+      if (key === toKeyMini(_cmInicio)) cls += ' unico-rango';
+    }
+
+    const div = document.createElement('div');
+    div.className = cls;
+    div.textContent = fecha.getDate();
+    if (esEsteMes) {
+      div.onclick = () => clickDiaMini(fecha);
+    }
+    grid.appendChild(div);
+  }
+
+  // Hint
+  const hint = document.getElementById('cal-mini-hint');
+  if (_cmInicio && _cmFin) {
+    const diff = Math.round((_cmFin - _cmInicio) / 86400000) + 1;
+    hint.textContent = `${diff} día${diff>1?'s':''} seleccionado${diff>1?'s':''}`;
+  } else if (_cmInicio) {
+    hint.textContent = 'Ahora tocá el día de fin';
+  } else {
+    hint.textContent = 'Tocá el día de inicio';
+  }
+}
+
+function clickDiaMini(fecha) {
+  fecha.setHours(0,0,0,0);
+  if (!_cmInicio || (_cmInicio && _cmFin)) {
+    // Primer click: inicio nuevo
+    _cmInicio = fecha;
+    _cmFin = null;
+  } else {
+    // Segundo click: fin
+    if (fecha < _cmInicio) {
+      _cmFin = _cmInicio;
+      _cmInicio = fecha;
+    } else {
+      _cmFin = fecha;
+    }
+  }
+  renderCalMini();
+}
+
+function limpiarCalMini() {
+  _cmInicio = null; _cmFin = null;
+  renderCalMini();
+}
+
+function confirmarCalMini() {
+  if (_cmIdx === null) return;
+  const l = getUnidades();
+  l[_cmIdx].fechaInicio = _cmInicio ? toKeyMini(_cmInicio) : '';
+  l[_cmIdx].fechaFin    = _cmFin    ? toKeyMini(_cmFin)    : (l[_cmIdx].fechaInicio || '');
+  setUnidades(l);
+  cerrarCalMini();
+  renderPanelIzq();
+}
+
 function agregarSubtema(i){
   const inp=document.getElementById('sub-inp-'+i);
   const txt=inp?.value.trim(); if(!txt)return;
@@ -674,5 +837,28 @@ function pregSiguiente(){if(idxRepaso<preguntasRepaso.length-1){idxRepaso++;most
 function cerrarRepaso(){document.getElementById('modal-repaso').classList.remove('open');}
 document.getElementById('modal-repaso').addEventListener('click',e=>{if(e.target===document.getElementById('modal-repaso'))cerrarRepaso();});
 </script>
+
+<!-- MINI CALENDARIO POPUP -->
+<div class="cal-mini-overlay" id="cal-mini-overlay" onclick="cerrarCalMini()"></div>
+<div class="cal-mini-popup" id="cal-mini-popup" style="display:none">
+  <div class="cal-mini-header">
+    <button class="cal-mini-nav" onclick="navCalMini(-1)">‹</button>
+    <div class="cal-mini-titulo" id="cal-mini-titulo"></div>
+    <button class="cal-mini-nav" onclick="navCalMini(1)">›</button>
+  </div>
+  <div class="cal-mini-dias-head">
+    <div class="cal-mini-dh">Lu</div><div class="cal-mini-dh">Ma</div>
+    <div class="cal-mini-dh">Mi</div><div class="cal-mini-dh">Ju</div>
+    <div class="cal-mini-dh">Vi</div><div class="cal-mini-dh">Sá</div>
+    <div class="cal-mini-dh">Do</div>
+  </div>
+  <div class="cal-mini-grid" id="cal-mini-grid"></div>
+  <div class="cal-mini-hint" id="cal-mini-hint">Tocá un día para inicio, otro para fin</div>
+  <div class="cal-mini-acciones">
+    <button class="btn-cm-clear" onclick="limpiarCalMini()">Limpiar</button>
+    <button class="btn-cm-ok" onclick="confirmarCalMini()">Confirmar</button>
+  </div>
+</div>
+
 </body>
 </html>

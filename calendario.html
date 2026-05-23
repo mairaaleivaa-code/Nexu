@@ -267,12 +267,12 @@ function recolectarEventos(){
     if(!evMap[k])evMap[k]=[];
     evMap[k].push(ev);
   }
-  function agregarFranja(desdeStr,hastaStr,rangoId,texto,clsColor,tipo,link){
+  function agregarFranja(desdeStr,hastaStr,rangoId,texto,clsColor,tipo,link,materia,carrera){
     if(!desdeStr)return;
     const desde=parseFecha(desdeStr);
     const hasta=hastaStr?parseFecha(hastaStr):new Date(desde);
     if(!desde||isNaN(desde))return;
-    franjas.push({rangoId,texto,clsColor,desde,hasta,tipo,link:link||null});
+    franjas.push({rangoId,texto,clsColor,desde,hasta,tipo,link:link||null,materia:materia||null,carrera:carrera||null});
   }
 
   // Parciales
@@ -300,7 +300,7 @@ function recolectarEventos(){
       if(t.estado==='aprendido')return;
       const cls=f.carrera==='Medicina'?'franja-tema':'franja-tema-nut';
       const txt=t.nombre.length>20?t.nombre.slice(0,18)+'…':t.nombre;
-      agregarFranja(t.fechaInicio,t.fechaFin,`tema_${f.planId}_${ti}`,txt,cls,'tema',`final.html?id=${f.planId}`);
+      agregarFranja(t.fechaInicio,t.fechaFin,`tema_${f.planId}_${ti}`,txt,cls,'tema',`final.html?id=${f.planId}`,f.nombre,f.carrera);
     });
   });
 
@@ -434,13 +434,17 @@ function abrirModal(key){
   franjasHoy.forEach(fr=>{
     const checked=getCheck(fr.rangoId,key);
     const rango=`${fmtCorta(fr.desde)} – ${fmtCorta(fr.hasta)}`;
+    const carreraChip=fr.carrera
+      ?`<span style="font-size:0.58rem;font-weight:700;padding:0.1rem 0.35rem;border-radius:4px;margin-right:0.28rem;${fr.carrera==='Medicina'?'background:#dbeeff;color:#2563a8':'background:#fde8ee;color:#9b1c3a'}">${fr.carrera}</span>`
+      :'';
+    const subLabel=fr.materia?`${fr.materia} · ${rango}`:rango;
     html+=`
       <div class="modal-ev-item">
         <div class="modal-ev-check${checked?' on':''}" onclick="toggleCheck('${fr.rangoId}','${key}')">${checked?'✓':''}</div>
         <div class="modal-ev-dot" style="background:${dotCol[fr.clsColor]||'#888'}"></div>
         <div class="modal-ev-texto${checked?' done':''}">
-          <span style="font-weight:500">${fr.texto}</span>
-          <div class="modal-ev-sub">${rango}</div>
+          <div>${carreraChip}<span style="font-weight:500">${fr.texto}</span></div>
+          <div class="modal-ev-sub">${subLabel}</div>
         </div>
       </div>`;
   });
