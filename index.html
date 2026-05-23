@@ -1084,7 +1084,19 @@ function asignarMesaAFinal(fecha) {
 
 // ── FINALES ──
 function getFinales(){return ls('finales')||[];}
-function setFinales(l){lsSet('finales',l);}
+function setFinales(l){
+  // Ordenar por fecha de examen: sin fecha al final, con fecha de más próxima a más lejana
+  l.sort((a,b)=>{
+    if(!a.fecha&&!b.fecha) return 0;
+    if(!a.fecha) return 1;
+    if(!b.fecha) return -1;
+    const pa=a.fecha.split('/'),pb=b.fecha.split('/');
+    const da=new Date(+pa[2],+pa[1]-1,+pa[0]);
+    const db=new Date(+pb[2],+pb[1]-1,+pb[0]);
+    return da-db;
+  });
+  lsSet('finales',l);
+}
 
 function abrirModalFinal(){
   const sel=document.getElementById('f-materia-id');
@@ -1423,7 +1435,8 @@ function renderParciales() {
   const container = document.getElementById('parciales-barra');
   if (!container) return;
 
-  const todasMaterias = [...(MATERIAS||[]), ...(getCustom()||[])];
+  const ocultas = getMateriaOcultas();
+  const todasMaterias = [...(MATERIAS||[]), ...(getCustom()||[])].filter(m=>!ocultas.includes(m.id));
   const lista = [];
 
   todasMaterias.forEach(m => {
