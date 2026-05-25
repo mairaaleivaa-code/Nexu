@@ -43,7 +43,7 @@
   .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
 
   /* CELDA */
-  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:110px; padding:0.45rem 0.5rem 0.5rem; display:flex; flex-direction:column; gap:0; position:relative; transition:box-shadow 0.13s; overflow:hidden; }
+  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:110px; padding:0.45rem 0.5rem 0.5rem; display:flex; flex-direction:column; gap:0; position:relative; transition:box-shadow 0.13s; overflow:visible; }
   .cal-cell:hover { box-shadow:0 2px 10px rgba(0,0,0,0.07); z-index:2; }
   .cal-cell.otro-mes { background:var(--bg); border-color:transparent; }
   .cal-cell.otro-mes .cal-num { color:var(--border); }
@@ -360,7 +360,7 @@ function render(){
     // Franjas: mostrar en todos los días del rango
     let nFranjas=0;
     franjasHoy.forEach(fr=>{
-      if(nFranjas>=3)return;
+      // sin límite de franjas
       nFranjas++;
       const esInicio=toKey(fr.desde)===key;
       const esFin=toKey(fr.hasta)===key;
@@ -378,29 +378,32 @@ function render(){
     });
 
     // Puntuales (máx 3 - franjas)
-    const maxP=Math.max(0,3-nFranjas);
     let nP=0;
     puntuales.forEach(ev=>{
-      if(nP>=maxP)return;
       nP++;
       const rid=ev.rangoId||`${ev.tipo}_${ev.texto}`;
       const checked=getCheck(rid,key);
       const div=document.createElement('div');
       div.className=`ev ${ev.cls}${checked?' chequeado':''}`;
       div.title=`${ev.texto}`;
-      div.textContent=ev.texto;
-      div.onclick=(e)=>{e.stopPropagation();abrirModal(key);};
+      div.style.display='flex';div.style.alignItems='center';div.style.justifyContent='space-between';div.style.gap='2px';
+      const span=document.createElement('span');
+      span.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1';
+      span.textContent=ev.texto;
+      div.appendChild(span);
+      if(ev.tipo==='manual'&&ev.id){
+        const x=document.createElement('button');
+        x.textContent='×';
+        x.style.cssText='background:none;border:none;cursor:pointer;font-size:0.7rem;line-height:1;padding:0 1px;color:inherit;opacity:0.6;flex-shrink:0';
+        x.title='Eliminar evento';
+        x.onclick=(e)=>{e.stopPropagation();if(confirm('¿Eliminar este evento?'))borrarManual(ev.id);};
+        div.appendChild(x);
+      }
+      div.onclick=(e)=>{if(e.target.tagName==='BUTTON')return;e.stopPropagation();abrirModal(key);};
       cell.appendChild(div);
     });
 
-    const totalReal=franjasHoy.length+puntuales.length;
-    const totalVis=nFranjas+nP;
-    if(totalReal>totalVis){
-      const mas=document.createElement('div');
-      mas.className='ev ev-mas';
-      mas.textContent=`+${totalReal-totalVis} más`;
-      cell.appendChild(mas);
-    }
+    // todos los eventos visibles — sin chip '+N más'
 
     if(totalReal>0){
       cell.style.cursor='pointer';
