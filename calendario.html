@@ -40,10 +40,10 @@
 
   .cal-head { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
   .cal-head-day { text-align:center; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); padding:0.3rem 0; }
-  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; align-items:start; }
 
   /* CELDA */
-  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:110px; padding:0.45rem 0.5rem 0.5rem; display:flex; flex-direction:column; gap:0; position:relative; transition:box-shadow 0.13s; overflow:visible; }
+  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:8px; min-height:110px; width:100%; padding:0.45rem 0.5rem 0.5rem; display:flex; flex-direction:column; gap:0; position:relative; transition:box-shadow 0.13s; overflow:hidden; box-sizing:border-box; }
   .cal-cell:hover { box-shadow:0 2px 10px rgba(0,0,0,0.07); z-index:2; }
   .cal-cell.otro-mes { background:var(--bg); border-color:transparent; }
   .cal-cell.otro-mes .cal-num { color:var(--border); }
@@ -56,7 +56,7 @@
   .btn-add-evento:hover { color:var(--text); }
 
   /* CHIPS PUNTUALES */
-  .ev { font-size:0.6rem; font-weight:600; padding:0.1rem 0.38rem; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.5; cursor:pointer; margin-bottom:0.18rem; }
+  .ev { font-size:0.6rem; font-weight:600; padding:0.1rem 0.38rem; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.5; cursor:pointer; margin-bottom:0.18rem; max-width:100%; display:block; }
   .ev-parcial { background:#fce8e0; color:#c1440e; border-left:2px solid #c1440e; }
   .ev-final   { background:var(--success-light); color:var(--success); border-left:2px solid var(--success); }
   .ev-manual  { background:var(--warning-light); color:var(--warning); border-left:2px solid var(--warning); }
@@ -367,7 +367,8 @@ function render(){
       const esUnico=esInicio&&esFin;
       const checked=getCheck(fr.rangoId,key);
       // Mostrar nombre solo en inicio y fin, punto en días del medio
-      const label=esUnico||esInicio||esFin ? fr.texto : fr.texto;
+      const truncar=(s,n=4)=>s.split(' ').slice(0,n).join(' ')+(s.split(' ').length>n?'…':'');
+      const label=truncar(fr.texto);
 
       const div=document.createElement('div');
       div.className=`ev ${fr.clsColor.replace('franja-','ev-')}${checked?' chequeado':''}`;
@@ -389,7 +390,8 @@ function render(){
       div.style.display='flex';div.style.alignItems='center';div.style.justifyContent='space-between';div.style.gap='2px';
       const span=document.createElement('span');
       span.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1';
-      span.textContent=ev.texto;
+      const truncarEv=(s,n=4)=>s.split(' ').slice(0,n).join(' ')+(s.split(' ').length>n?'…':'');
+      span.textContent=truncarEv(ev.texto);
       div.appendChild(span);
       if(ev.tipo==='manual'&&ev.id){
         const x=document.createElement('button');
