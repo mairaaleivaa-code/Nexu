@@ -254,12 +254,10 @@
   .pend-resumen-empty { padding:1rem 1.1rem; text-align:center; color:var(--text-muted); font-size:0.78rem; }
   .pend-resumen-item { display:flex; align-items:center; gap:0.55rem; padding:0.5rem 1.1rem; border-bottom:1px solid var(--surface2); }
   .pend-resumen-item:last-child { border-bottom:none; }
-  .pend-prio-sel { display:flex; gap:0.2rem; flex-shrink:0; }
-  .pend-prio-btn { width:20px; height:20px; border-radius:5px; border:1px solid var(--border); background:var(--surface2); font-size:0.62rem; font-weight:700; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.13s; }
-  .pend-prio-btn:hover { border-color:var(--text); }
-  .pend-prio-btn.activo-1 { background:var(--danger); color:white; border-color:var(--danger); }
-  .pend-prio-btn.activo-2 { background:var(--warning); color:white; border-color:var(--warning); }
-  .pend-prio-btn.activo-3 { background:var(--success); color:white; border-color:var(--success); }
+  .pend-drag-handle { cursor:grab; color:var(--text-muted); font-size:0.95rem; flex-shrink:0; touch-action:none; padding:0 0.15rem; line-height:1; user-select:none; }
+  .pend-drag-handle:hover { color:var(--text); }
+  .pend-resumen-item.dragging { opacity:0.55; background:var(--surface2); cursor:grabbing; }
+  .pend-resumen-item { cursor:default; }
   .pend-resumen-check { width:16px; height:16px; flex-shrink:0; cursor:pointer; }
   .pend-resumen-texto { flex:1; font-size:0.8rem; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .pend-resumen-materia { font-size:0.62rem; font-weight:700; padding:0.12rem 0.4rem; border-radius:5px; flex-shrink:0; white-space:nowrap; }
@@ -592,19 +590,31 @@ function togglePendResumen() {
   document.getElementById('pend-resumen-arrow').textContent = _pendResumenOpen ? '▴' : '▾';
 }
 
+function ensurePendIds(materiaId) {
+  const l = getPend(materiaId);
+  let changed = false;
+  l.forEach(p => { if (!p.id) { p.id = 'p'+Date.now()+Math.random().toString(36).slice(2,7); changed = true; } });
+  if (changed) setPend(materiaId, l);
+  return l;
+}
+
+function getPendOrdenManual() { return ls('pend_orden_manual') || []; }
+function setPendOrdenManual(arr) { lsSet('pend_orden_manual', arr); }
+
 function getTodosPendientes() {
   const mats = getAllMaterias();
   const items = [];
   mats.forEach(m => {
-    const lista = getPend(m.id);
-    lista.forEach((p, i) => {
+    const lista = ensurePendIds(m.id);
+    lista.forEach(p => {
       if (p.done) return;
-      items.push({ materiaId: m.id, materiaNombre: m.nombre, carrera: m.carrera, idx: i, texto: p.texto, prioridad: p.prioridad || null });
+      items.push({ id: p.id, materiaId: m.id, materiaNombre: m.nombre, carrera: m.carrera, texto: p.texto });
     });
   });
-  // Ordenar: con prioridad primero (1,2,3 asc), sin prioridad al final, manteniendo orden relativo
+  const orden = getPendOrdenManual();
   items.sort((a, b) => {
-    const pa = a.prioridad || 99, pb = b.prioridad || 99;
+    const ia = orden.indexOf(a.id), ib = orden.indexOf(b.id);
+    const pa = ia === -1 ? 9999 : ia, pb = ib === -1 ? 9999 : ib;
     return pa - pb;
   });
   return items;
@@ -622,34 +632,72 @@ function renderPendResumen() {
 
   body.innerHTML = items.map(it => {
     const chipCls = it.carrera === 'Medicina' ? 'chip-medicina' : 'chip-nutricion';
-    const prioBtns = [1,2,3].map(n => `
-      <button class="pend-prio-btn${it.prioridad===n?' activo-'+n:''}" onclick="setPrioridadPend('${it.materiaId}',${it.idx},${it.prioridad===n?'null':n})" title="Prioridad ${n}">${n}</button>
-    `).join('');
     return `
-      <div class="pend-resumen-item">
-        <div class="pend-prio-sel">${prioBtns}</div>
-        <input type="checkbox" class="pend-resumen-check" onchange="completarPendDesdeResumen('${it.materiaId}',${it.idx})">
+      <div class="pend-resumen-item" data-id="${it.id}">
+        <span class="pend-drag-handle" onpointerdown="pendDragStart(event,'${it.id}')" title="Arrastrá para reordenar">⠿</span>
+        <input type="checkbox" class="pend-resumen-check" onchange="completarPendDesdeResumenById('${it.id}','${it.materiaId}')">
         <span class="pend-resumen-texto" title="${it.texto}">${it.texto}</span>
         <span class="pend-resumen-materia ${chipCls}">${it.materiaNombre}</span>
       </div>`;
   }).join('');
+
+  // Asegurar que el orden guardado refleje el orden actual mostrado (para futuros renders)
+  setPendOrdenManual(items.map(it => it.id));
 }
 
-function setPrioridadPend(materiaId, idx, valor) {
+function completarPendDesdeResumenById(itemId, materiaId) {
   const l = getPend(materiaId);
-  if (!l[idx]) return;
-  l[idx].prioridad = valor;
-  setPend(materiaId, l);
-  renderPendResumen();
-}
-
-function completarPendDesdeResumen(materiaId, idx) {
-  const l = getPend(materiaId);
-  if (!l[idx]) return;
+  const idx = l.findIndex(p => p.id === itemId);
+  if (idx < 0) return;
   l[idx].done = true;
   setPend(materiaId, l);
+  // quitar del orden manual guardado
+  setPendOrdenManual(getPendOrdenManual().filter(id => id !== itemId));
   renderPendResumen();
   refreshCard(materiaId);
+}
+
+// ── DRAG & DROP MANUAL (mouse + touch) ──
+let _pendDragId = null;
+
+function pendDragStart(e, id) {
+  e.preventDefault();
+  _pendDragId = id;
+  document.body.style.userSelect = 'none';
+  const row = document.querySelector(`.pend-resumen-item[data-id="${id}"]`);
+  if (row) row.classList.add('dragging');
+  document.addEventListener('pointermove', pendDragMove);
+  document.addEventListener('pointerup', pendDragEnd);
+}
+
+function pendDragMove(e) {
+  if (!_pendDragId) return;
+  const rows = [...document.querySelectorAll('.pend-resumen-item')];
+  const draggingRow = rows.find(r => r.dataset.id === _pendDragId);
+  if (!draggingRow) return;
+  const y = e.clientY;
+  for (const r of rows) {
+    if (r === draggingRow) continue;
+    const rect = r.getBoundingClientRect();
+    if (y >= rect.top && y <= rect.bottom) {
+      const before = y < rect.top + rect.height / 2;
+      if (before) r.parentNode.insertBefore(draggingRow, r);
+      else r.parentNode.insertBefore(draggingRow, r.nextSibling);
+      break;
+    }
+  }
+}
+
+function pendDragEnd() {
+  if (!_pendDragId) return;
+  document.removeEventListener('pointermove', pendDragMove);
+  document.removeEventListener('pointerup', pendDragEnd);
+  document.body.style.userSelect = '';
+  const row = document.querySelector(`.pend-resumen-item[data-id="${_pendDragId}"]`);
+  if (row) row.classList.remove('dragging');
+  _pendDragId = null;
+  const idsEnOrden = [...document.querySelectorAll('.pend-resumen-item')].map(r => r.dataset.id);
+  setPendOrdenManual(idsEnOrden);
 }
 
 // ── MERGE: base + overrides ──
@@ -962,7 +1010,7 @@ function buildPendPanel(id) {
 function togglePendPanel(id) { document.getElementById('pend-'+id)?.classList.toggle('open'); }
 function agregarPend(id) {
   const inp=document.getElementById('pi-'+id); const txt=inp.value.trim(); if(!txt) return;
-  const l=getPend(id); l.push({texto:txt,done:false}); setPend(id,l); inp.value='';
+  const l=getPend(id); l.push({texto:txt,done:false,id:'p'+Date.now()+Math.random().toString(36).slice(2,7)}); setPend(id,l); inp.value='';
   const panel=document.getElementById('pend-'+id);
   if(panel){panel.innerHTML=buildPendPanel(id);panel.classList.add('open');}
   refreshCard(id);
