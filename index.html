@@ -104,6 +104,8 @@
   /* TIMELINE */
   .timeline-wrap { margin-bottom:0.65rem; }
   .timeline-dates { display:flex; justify-content:space-between; font-size:0.59rem; color:var(--text-muted); margin-bottom:0.28rem; }
+  .timeline-fecha-edit { cursor:pointer; transition:color 0.13s; }
+  .timeline-fecha-edit:hover { color:var(--text); text-decoration:underline; }
   .timeline-track { position:relative; height:5px; background:var(--track); border-radius:10px; overflow:visible; }
   .timeline-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#94a3b8,#64748b); }
   .timeline-dot { position:absolute; top:50%; transform:translateY(-50%); width:8px; height:8px; border-radius:50%; border:1.5px solid white; }
@@ -241,6 +243,27 @@
   .parc-sep { font-size:0.75rem; color:#fbbf24; flex-shrink:0; font-weight:700; align-self:center; }
   .parc-empty { font-size:0.75rem; color:var(--text-muted); font-style:italic; padding:0.3rem 0; }
 
+  /* ── RESUMEN PENDIENTES ── */
+  .pend-resumen { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:1.1rem; overflow:hidden; }
+  .pend-resumen-header { padding:0.7rem 1.1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.6rem; cursor:pointer; }
+  .pend-resumen-titulo { font-family:'Montserrat',sans-serif; font-size:0.85rem; font-weight:700; flex:1; }
+  .pend-resumen-count { font-size:0.7rem; background:var(--surface2); color:var(--text-muted); padding:0.15rem 0.55rem; border-radius:20px; border:1px solid var(--border); }
+  .pend-resumen-arrow { font-size:0.7rem; color:var(--text-muted); transition:transform 0.15s; }
+  .pend-resumen-body { display:none; padding:0.3rem 0; }
+  .pend-resumen-body.open { display:block; }
+  .pend-resumen-empty { padding:1rem 1.1rem; text-align:center; color:var(--text-muted); font-size:0.78rem; }
+  .pend-resumen-item { display:flex; align-items:center; gap:0.55rem; padding:0.5rem 1.1rem; border-bottom:1px solid var(--surface2); }
+  .pend-resumen-item:last-child { border-bottom:none; }
+  .pend-prio-sel { display:flex; gap:0.2rem; flex-shrink:0; }
+  .pend-prio-btn { width:20px; height:20px; border-radius:5px; border:1px solid var(--border); background:var(--surface2); font-size:0.62rem; font-weight:700; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.13s; }
+  .pend-prio-btn:hover { border-color:var(--text); }
+  .pend-prio-btn.activo-1 { background:var(--danger); color:white; border-color:var(--danger); }
+  .pend-prio-btn.activo-2 { background:var(--warning); color:white; border-color:var(--warning); }
+  .pend-prio-btn.activo-3 { background:var(--success); color:white; border-color:var(--success); }
+  .pend-resumen-check { width:16px; height:16px; flex-shrink:0; cursor:pointer; }
+  .pend-resumen-texto { flex:1; font-size:0.8rem; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pend-resumen-materia { font-size:0.62rem; font-weight:700; padding:0.12rem 0.4rem; border-radius:5px; flex-shrink:0; white-space:nowrap; }
+
   @media(max-width:1024px) { .materias-grid { grid-template-columns:repeat(2,1fr); } }
   @media(max-width:600px) {
     .materias-grid { grid-template-columns:1fr; }
@@ -306,6 +329,16 @@
 
   <!-- ── BARRA PARCIALES ── -->
   <div class="parciales-barra" id="parciales-barra"></div>
+
+  <!-- ── RESUMEN PENDIENTES ── -->
+  <div class="pend-resumen" id="pend-resumen">
+    <div class="pend-resumen-header" onclick="togglePendResumen()">
+      <span class="pend-resumen-titulo">📌 Pendientes</span>
+      <span class="pend-resumen-count" id="pend-resumen-count">0</span>
+      <span class="pend-resumen-arrow" id="pend-resumen-arrow">▾</span>
+    </div>
+    <div class="pend-resumen-body" id="pend-resumen-body"></div>
+  </div>
 
   <div class="materias-grid" id="materias-grid"></div>
 
@@ -434,6 +467,29 @@
   </div>
 </div>
 
+<!-- MODAL FECHAS CUATRIMESTRE -->
+<div class="modal-overlay" id="modal-fechas-cuatri">
+  <div class="modal" style="width:360px">
+    <h3>📅 Fechas del cuatrimestre</h3>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:1rem">Para <strong id="mfc-materia-nombre"></strong></p>
+    <input type="hidden" id="mfc-materia-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Inicio</label>
+        <input type="date" id="mfc-inicio">
+      </div>
+      <div class="form-group">
+        <label>Fin</label>
+        <input type="date" id="mfc-fin">
+      </div>
+    </div>
+    <div class="modal-actions" style="margin-top:0.75rem">
+      <button class="btn-cancel" onclick="cerrarModal('modal-fechas-cuatri')">Cancelar</button>
+      <button class="btn-save" onclick="guardarFechasCuatri()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL AGREGAR PARCIAL -->
 <div class="modal-overlay" id="modal-parcial">
   <div class="modal">
@@ -485,9 +541,20 @@ function chipDias(d) {
   if (d<=21)return `<span class="dias-chip dias-pronto">${d}d</span>`;
   return `<span class="dias-chip dias-ok">${d}d</span>`;
 }
-function pct(f) {
-  const total=FIN_CUATRI-INICIO_CUATRI;
-  return ((Math.min(Math.max(f-INICIO_CUATRI,0),total)/total)*100).toFixed(2);
+function pct(f, ini, fin) {
+  ini = ini || INICIO_CUATRI; fin = fin || FIN_CUATRI;
+  const total=fin-ini;
+  if (total<=0) return 0;
+  return ((Math.min(Math.max(f-ini,0),total)/total)*100).toFixed(2);
+}
+function getRangoCuatri(m) {
+  const ov = getOv(m.id);
+  const ini = ov.fechaInicioCuatri ? new Date(ov.fechaInicioCuatri+'T00:00:00') : INICIO_CUATRI;
+  const fin = ov.fechaFinCuatri    ? new Date(ov.fechaFinCuatri+'T00:00:00')    : FIN_CUATRI;
+  return { ini, fin };
+}
+function formatFechaCorta(d) {
+  return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
 }
 function slugify(s) { return s.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''); }
 function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -515,6 +582,75 @@ function setProgUrl(id,url) { localStorage.setItem('prog_url_'+id,url); }
 // ── PENDIENTES ──
 function getPend(id) { return ls('pend_'+id)||[]; }
 function setPend(id,l) { lsSet('pend_'+id,l); }
+
+// ── RESUMEN DE PENDIENTES (todas las materias) ──
+let _pendResumenOpen = false;
+
+function togglePendResumen() {
+  _pendResumenOpen = !_pendResumenOpen;
+  document.getElementById('pend-resumen-body').classList.toggle('open', _pendResumenOpen);
+  document.getElementById('pend-resumen-arrow').textContent = _pendResumenOpen ? '▴' : '▾';
+}
+
+function getTodosPendientes() {
+  const mats = getAllMaterias();
+  const items = [];
+  mats.forEach(m => {
+    const lista = getPend(m.id);
+    lista.forEach((p, i) => {
+      if (p.done) return;
+      items.push({ materiaId: m.id, materiaNombre: m.nombre, carrera: m.carrera, idx: i, texto: p.texto, prioridad: p.prioridad || null });
+    });
+  });
+  // Ordenar: con prioridad primero (1,2,3 asc), sin prioridad al final, manteniendo orden relativo
+  items.sort((a, b) => {
+    const pa = a.prioridad || 99, pb = b.prioridad || 99;
+    return pa - pb;
+  });
+  return items;
+}
+
+function renderPendResumen() {
+  const items = getTodosPendientes();
+  document.getElementById('pend-resumen-count').textContent = items.length;
+  const body = document.getElementById('pend-resumen-body');
+
+  if (!items.length) {
+    body.innerHTML = '<div class="pend-resumen-empty">No tenés pendientes activos. 🎉</div>';
+    return;
+  }
+
+  body.innerHTML = items.map(it => {
+    const chipCls = it.carrera === 'Medicina' ? 'chip-medicina' : 'chip-nutricion';
+    const prioBtns = [1,2,3].map(n => `
+      <button class="pend-prio-btn${it.prioridad===n?' activo-'+n:''}" onclick="setPrioridadPend('${it.materiaId}',${it.idx},${it.prioridad===n?'null':n})" title="Prioridad ${n}">${n}</button>
+    `).join('');
+    return `
+      <div class="pend-resumen-item">
+        <div class="pend-prio-sel">${prioBtns}</div>
+        <input type="checkbox" class="pend-resumen-check" onchange="completarPendDesdeResumen('${it.materiaId}',${it.idx})">
+        <span class="pend-resumen-texto" title="${it.texto}">${it.texto}</span>
+        <span class="pend-resumen-materia ${chipCls}">${it.materiaNombre}</span>
+      </div>`;
+  }).join('');
+}
+
+function setPrioridadPend(materiaId, idx, valor) {
+  const l = getPend(materiaId);
+  if (!l[idx]) return;
+  l[idx].prioridad = valor;
+  setPend(materiaId, l);
+  renderPendResumen();
+}
+
+function completarPendDesdeResumen(materiaId, idx) {
+  const l = getPend(materiaId);
+  if (!l[idx]) return;
+  l[idx].done = true;
+  setPend(materiaId, l);
+  renderPendResumen();
+  refreshCard(materiaId);
+}
 
 // ── MERGE: base + overrides ──
 function getMateriaOcultas(){ return ls('materias_ocultas')||[]; }
@@ -547,22 +683,27 @@ function getAllMaterias() {
 }
 
 // ── TIMELINE ──
-function buildTimeline(parciales) {
-  const prog=pct(hoy);
+function buildTimeline(parciales, m) {
+  const { ini, fin } = m ? getRangoCuatri(m) : { ini: INICIO_CUATRI, fin: FIN_CUATRI };
+  const prog=pct(hoy, ini, fin);
   const dots=(parciales||[]).map(p=>{
     if(!p.fecha) return '';
-    const [d,m,y]=p.fecha.split('/'); const f=new Date(y,m-1,d); const pos=pct(f);
+    const [d,mo,y]=p.fecha.split('/'); const f=new Date(y,mo-1,d); const pos=pct(f, ini, fin);
     if(pos<0||pos>100) return '';
     return `<div class="timeline-dot dot-parcial" style="left:${pos}%" title="${p.nombre}: ${p.fecha}"></div>`;
   }).join('');
   const labs=(parciales||[]).map(p=>{
     if(!p.fecha) return '';
-    const [d,m,y]=p.fecha.split('/'); const f=new Date(y,m-1,d); const pos=pct(f);
+    const [d,mo,y]=p.fecha.split('/'); const f=new Date(y,mo-1,d); const pos=pct(f, ini, fin);
     if(pos<0||pos>100) return '';
     return `<span class="parcial-label" style="left:${pos}%">${p.nombre}</span>`;
   }).join('');
-  return `<div class="timeline-wrap">
-    <div class="timeline-dates"><span>1 abr</span><span>17 jul</span></div>
+  const idAttr = m ? `data-mid="${m.id}"` : '';
+  return `<div class="timeline-wrap" ${idAttr}>
+    <div class="timeline-dates">
+      <span class="timeline-fecha-edit" ${m?`onclick="abrirEditarFechasCuatri('${m.id}')" title="Editar fechas"`:''}>${formatFechaCorta(ini)}</span>
+      <span class="timeline-fecha-edit" ${m?`onclick="abrirEditarFechasCuatri('${m.id}')" title="Editar fechas"`:''}>${formatFechaCorta(fin)} ✎</span>
+    </div>
     <div class="timeline-track">
       <div class="timeline-fill" style="width:${prog}%"></div>
       <div class="timeline-dot dot-today" style="left:${prog}%" title="Hoy"></div>
@@ -653,7 +794,7 @@ function buildCard(m) {
         </div>
       </div>
 
-      ${buildTimeline(getTodasParciales(m))}
+      ${buildTimeline(getTodasParciales(m), m)}
 
       <div class="examen-row">
         ${(()=>{
@@ -824,20 +965,22 @@ function agregarPend(id) {
   const l=getPend(id); l.push({texto:txt,done:false}); setPend(id,l); inp.value='';
   const panel=document.getElementById('pend-'+id);
   if(panel){panel.innerHTML=buildPendPanel(id);panel.classList.add('open');}
-  // update badge
   refreshCard(id);
+  renderPendResumen();
 }
 function togglePendItem(id,i) {
   const l=getPend(id); l[i].done=!l[i].done; setPend(id,l);
   const panel=document.getElementById('pend-'+id);
   if(panel){const wasOpen=panel.classList.contains('open');panel.innerHTML=buildPendPanel(id);if(wasOpen)panel.classList.add('open');}
   refreshCard(id);
+  renderPendResumen();
 }
 function borrarPend(id,i) {
   const l=getPend(id); l.splice(i,1); setPend(id,l);
   const panel=document.getElementById('pend-'+id);
   if(panel){const wasOpen=panel.classList.contains('open');panel.innerHTML=buildPendPanel(id);if(wasOpen)panel.classList.add('open');}
   refreshCard(id);
+  renderPendResumen();
 }
 
 // ── PARCIALES ──
@@ -857,6 +1000,30 @@ function getProximoParcial(m) {
     return diasRestantes(p.fecha)!==null && diasRestantes(p.fecha)>=0;
   }).sort((a,b)=>diasRestantes(a.fecha)-diasRestantes(b.fecha));
   return futuros[0]||null;
+}
+
+function abrirEditarFechasCuatri(id) {
+  const m = getAllMaterias().find(x=>x.id===id);
+  if (!m) return;
+  const { ini, fin } = getRangoCuatri(m);
+  document.getElementById('mfc-materia-id').value = id;
+  document.getElementById('mfc-materia-nombre').textContent = m.nombre;
+  document.getElementById('mfc-inicio').value = ini.toISOString().slice(0,10);
+  document.getElementById('mfc-fin').value = fin.toISOString().slice(0,10);
+  document.getElementById('modal-fechas-cuatri').classList.add('open');
+}
+
+function guardarFechasCuatri() {
+  const id = document.getElementById('mfc-materia-id').value;
+  const inicio = document.getElementById('mfc-inicio').value;
+  const fin = document.getElementById('mfc-fin').value;
+  if (!inicio || !fin) { alert('Completá ambas fechas'); return; }
+  const ov = getOv(id);
+  ov.fechaInicioCuatri = inicio;
+  ov.fechaFinCuatri = fin;
+  setOv(id, ov);
+  cerrarModal('modal-fechas-cuatri');
+  refreshCard(id);
 }
 
 function abrirModalParciales(id) {
@@ -1428,6 +1595,7 @@ function importarDatos(input){
 renderMaterias();
 renderFinales();
 renderMesas();
+renderPendResumen();
 renderParciales();
 
 // ── BARRA DE PARCIALES ──
